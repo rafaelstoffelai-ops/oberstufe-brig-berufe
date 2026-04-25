@@ -1591,7 +1591,7 @@
     <div class="scenario-box">
       <strong style="font-size: 1.1em;">Das Szenario:</strong><br><br>
       "Das Auto muss in die Waschanlage, 300m entfernt. Wie komme ich hin?"<br><br>
-      <button class="reveal-btn" onclick="document.getElementById('ki-reveal').classList.toggle('show'); this.textContent = this.textContent.includes('zeigen') ? '✓ Aufgedeckt!' : 'KI-Antwort zeigen'">🤖 KI-Antwort zeigen</button>
+      <button class="reveal-btn" id="btn-ki-reveal" onclick="toggleReveal('ki-reveal', this)">🤖 KI-Antwort zeigen</button>
       <div class="reveal-content" id="ki-reveal">
         <strong style="color: #dc2626;">KI antwortet:</strong> "Gehen Sie 300 Meter nach links zur Waschanlage."<br><br>
         <strong style="color: #15803d;">Auflösung:</strong> Das <em>Auto</em> muss fahren, nicht du! KI liest Text — aber nie die Realität.
@@ -2011,6 +2011,14 @@
   let _bc = null;
   try { _bc = new BroadcastChannel('praesentation_brig_2026'); } catch(e) {}
 
+  function toggleReveal(targetId, btn) {
+    const el = document.getElementById(targetId);
+    if (!el) return;
+    const isShow = el.classList.toggle('show');
+    if (btn) btn.textContent = isShow ? '✓ Aufgedeckt!' : '🤖 KI-Antwort zeigen';
+    broadcastState();
+  }
+
   function broadcastState() {
     const slideEl = document.querySelector('.slide.active');
     const slideTitle = slideEl ? (slideEl.querySelector('.slide-title')?.textContent || sectionLabel[state.currentSection] || '') : '';
@@ -2019,7 +2027,10 @@
       slideIndex: state.currentSlide,
       slideTitle: slideTitle,
       sectionLabel: sectionLabel[state.currentSection] || state.currentSection,
-      infoSpec: state.infoSpecialization || null
+      infoSpec: state.infoSpecialization || null,
+      reveals: {
+        'ki-reveal': !!(document.getElementById('ki-reveal')?.classList.contains('show'))
+      }
     };
     if (_bc) _bc.postMessage({ type: 'stateUpdate', state: _stateData });
     if (_fbSessionRef) _fbSessionRef.child('state').set(_stateData);
@@ -2090,6 +2101,10 @@
         else if (data.action === 'hub') goToHub();
         else if (data.action === 'goto' && data.section) goToSection(data.section);
         else if (data.action === 'infospec' && data.spec) setInfoSpec(data.spec);
+        else if (data.action === 'toggle' && data.target) {
+          const btn = document.getElementById('btn-' + data.target);
+          toggleReveal(data.target, btn);
+        }
       });
 
       broadcastState();

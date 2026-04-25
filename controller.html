@@ -216,6 +216,25 @@
     .error-msg.show { display: block; }
 
     .hint { font-size: 13px; color: #475569; line-height: 1.6; }
+    /* Slide action buttons */
+    #action-panel { width: 100%; flex-direction: column; gap: 10px; display: none; }
+    .action-btn {
+      width: 100%;
+      padding: 16px 20px;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.12s, opacity 0.12s;
+      background: #7c3aed;
+      color: #fff;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .action-btn:active { transform: scale(0.97); opacity: 0.8; }
+    .action-btn.revealed { background: #16a34a; }
+
     .disconnect-btn {
       background: none; border: none;
       color: #475569; font-size: 14px;
@@ -278,6 +297,9 @@
       ⏮ Zum Start
     </button>
   </div>
+
+  <!-- Slide-spezifische Aktionen (dynamisch) -->
+  <div id="action-panel"></div>
 
   <!-- Beruf-Auswahl -->
   <div class="row-label">Direkt zu Beruf</div>
@@ -350,6 +372,13 @@ const FIREBASE_CONFIG = {
   appId:             "1:940814987830:web:da863d92c96b77c7839e97"
 };
 
+// Slide-spezifische Aktionen: 'section:slideIndex' → Array von Actions
+const SLIDE_ACTIONS = {
+  'ki:1': [
+    { target: 'ki-reveal', action: 'toggle', label: '🤖 KI-Antwort zeigen', labelRevealed: '✓ Aufgedeckt — wieder verbergen' }
+  ]
+};
+
 let db = null;
 let sessionRef = null;
 let lastCmdTs = 0;
@@ -402,6 +431,7 @@ async function connect() {
       if (!s) return;
       document.getElementById('ctrl-slide-title').textContent = s.slideTitle || s.section || '—';
       updateInfoPanel(s);
+      updateActionPanel(s);
     });
 
     sessionRef.child('alive').on('value', snap => {
@@ -444,6 +474,37 @@ function updateInfoPanel(s) {
     document.getElementById('btn-active-plat').className =
       'beruf-btn btn-info-plat' + (spec === 'plattform' ? ' spec-active' : spec ? ' spec-inactive' : '');
   }
+}
+
+function updateActionPanel(s) {
+  const panel = document.getElementById('action-panel');
+  const key = s.section + ':' + s.slideIndex;
+  const actions = SLIDE_ACTIONS[key] || [];
+  const reveals = s.reveals || {};
+
+  if (actions.length === 0) {
+    panel.style.display = 'none';
+    panel.innerHTML = '';
+    return;
+  }
+
+  panel.style.display = 'flex';
+  panel.innerHTML = actions.map(a => {
+    const isRevealed = !!reveals[a.target];
+    const label = isRevealed && a.labelRevealed ? a.labelRevealed : a.label;
+    const cls = 'action-btn' + (isRevealed ? ' revealed' : '');
+    return `<button class="${cls}"
+      ontouchstart="sendAction('${a.action}','${a.target}')"
+      onclick="sendAction('${a.action}','${a.target}')">${label}</button>`;
+  }).join('');
+}
+
+function sendAction(action, target) {
+  const now = Date.now();
+  if (now - lastCmdTs < 300) return;
+  lastCmdTs = now;
+  if (!sessionRef) return;
+  sessionRef.child('command').set({ action, target, ts: now });
 }
 
 function sendCmd(action) {
