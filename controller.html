@@ -12,38 +12,39 @@
       background: #0f172a;
       color: #f1f5f9;
       min-height: 100vh;
+      overflow-y: auto;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+      padding: 24px 16px;
     }
 
     .screen {
       display: none;
       flex-direction: column;
       align-items: center;
-      gap: 24px;
+      gap: 16px;
       width: 100%;
       max-width: 420px;
       text-align: center;
     }
     .screen.active { display: flex; }
 
-    h1 { font-size: 28px; font-weight: 800; }
-    h2 { font-size: 22px; font-weight: 700; }
-    p  { color: #94a3b8; font-size: 16px; line-height: 1.5; }
-
-    .logo { font-size: 56px; line-height: 1; }
+    h1 { font-size: 26px; font-weight: 800; }
+    h2 { font-size: 20px; font-weight: 700; }
+    p  { color: #94a3b8; font-size: 15px; line-height: 1.5; }
+    .logo { font-size: 48px; line-height: 1; }
 
     /* Code input */
     .code-input {
       width: 100%;
-      padding: 20px 24px;
+      padding: 18px 20px;
       background: #1e293b;
       border: 2px solid #334155;
       border-radius: 16px;
       color: #f1f5f9;
-      font-size: 36px;
+      font-size: 34px;
       font-weight: 800;
       text-align: center;
       letter-spacing: 8px;
@@ -56,12 +57,12 @@
 
     .connect-btn {
       width: 100%;
-      padding: 20px;
+      padding: 18px;
       background: #2563eb;
       color: #fff;
       border: none;
       border-radius: 16px;
-      font-size: 20px;
+      font-size: 19px;
       font-weight: 700;
       cursor: pointer;
       transition: background 0.2s, transform 0.15s;
@@ -72,8 +73,7 @@
 
     /* Status */
     .status-dot {
-      width: 10px;
-      height: 10px;
+      width: 10px; height: 10px;
       border-radius: 50%;
       background: #64748b;
       display: inline-block;
@@ -81,46 +81,35 @@
       transition: background 0.3s;
     }
     .status-dot.connected { background: #22c55e; animation: pulse-dot 2s infinite; }
-    .status-dot.error { background: #ef4444; }
-    @keyframes pulse-dot {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
+    .status-dot.error     { background: #ef4444; }
+    @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.4} }
     .status-text { font-size: 14px; color: #64748b; }
 
     .slide-info {
       background: #1e293b;
-      border-radius: 16px;
-      padding: 20px 24px;
+      border-radius: 14px;
+      padding: 14px 20px;
       width: 100%;
       border: 1px solid #334155;
     }
     .slide-info .section-label {
-      font-size: 13px;
-      color: #64748b;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 6px;
+      font-size: 12px; color: #64748b;
+      text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;
     }
-    .slide-info .slide-title-display {
-      font-size: 20px;
-      font-weight: 700;
-      color: #f1f5f9;
-    }
+    .slide-info .slide-title-display { font-size: 18px; font-weight: 700; }
 
-    /* Control buttons */
+    /* Nav buttons */
     .ctrl-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
+      gap: 12px;
       width: 100%;
     }
     .ctrl-btn {
-      padding: 0;
-      height: 120px;
+      height: 100px;
       border: none;
-      border-radius: 20px;
-      font-size: 32px;
+      border-radius: 18px;
+      font-size: 28px;
       font-weight: 800;
       cursor: pointer;
       transition: transform 0.12s, opacity 0.12s;
@@ -128,47 +117,46 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 4px;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
     }
     .ctrl-btn:active { transform: scale(0.93); opacity: 0.8; }
-    .ctrl-btn small { font-size: 13px; font-weight: 500; opacity: 0.8; }
-
+    .ctrl-btn small { font-size: 12px; font-weight: 500; opacity: 0.8; }
     .btn-prev { background: #334155; color: #f1f5f9; }
     .btn-next { background: #2563eb; color: #fff; }
     .btn-hub {
       grid-column: 1 / -1;
-      height: 72px;
+      height: 62px;
       background: #1e293b;
       color: #94a3b8;
       border: 2px solid #334155;
-      font-size: 20px;
+      font-size: 18px;
     }
 
-    .section-label-row {
+    /* Divider */
+    .row-label {
       width: 100%;
-      font-size: 12px;
+      font-size: 11px;
       color: #475569;
       text-transform: uppercase;
       letter-spacing: 1px;
       text-align: left;
-      padding: 0 4px;
-      margin-bottom: -8px;
+      margin-bottom: -4px;
     }
 
+    /* Beruf buttons */
     .beruf-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      gap: 10px;
       width: 100%;
     }
     .beruf-btn {
-      padding: 0;
-      height: 88px;
+      height: 80px;
       border: none;
-      border-radius: 16px;
-      font-size: 15px;
+      border-radius: 14px;
+      font-size: 14px;
       font-weight: 700;
       cursor: pointer;
       transition: transform 0.12s, opacity 0.12s;
@@ -182,28 +170,19 @@
       color: #fff;
     }
     .beruf-btn:active { transform: scale(0.93); opacity: 0.8; }
-    .beruf-btn .beruf-icon { font-size: 22px; }
-    .btn-auto { background: #2563eb; }
-    .btn-info { background: #16a34a; }
-    .btn-elek { background: #ea580c; }
-    .btn-ki   { background: #7c3aed; }
+    .beruf-btn .bi { font-size: 20px; }
+    .btn-auto  { background: #2563eb; }
+    .btn-elek  { background: #ea580c; }
+    .btn-info-app  { background: #16a34a; }
+    .btn-info-plat { background: #15803d; }
+    .btn-ki    { grid-column: 1 / -1; height: 62px; background: #7c3aed; font-size: 15px; flex-direction: row; gap: 8px; }
 
-    .disconnect-btn {
-      background: none;
-      border: none;
-      color: #475569;
-      font-size: 14px;
-      cursor: pointer;
-      padding: 8px;
-      text-decoration: underline;
-    }
-    .disconnect-btn:hover { color: #ef4444; }
-
+    /* Error */
     .error-msg {
       background: #450a0a;
       border: 1px solid #ef4444;
       border-radius: 12px;
-      padding: 14px 18px;
+      padding: 12px 16px;
       font-size: 14px;
       color: #fca5a5;
       width: 100%;
@@ -211,11 +190,14 @@
     }
     .error-msg.show { display: block; }
 
-    .hint {
-      font-size: 13px;
-      color: #475569;
-      line-height: 1.6;
+    .hint { font-size: 13px; color: #475569; line-height: 1.6; }
+    .disconnect-btn {
+      background: none; border: none;
+      color: #475569; font-size: 14px;
+      cursor: pointer; padding: 8px;
+      text-decoration: underline;
     }
+    .disconnect-btn:hover { color: #ef4444; }
   </style>
 </head>
 <body>
@@ -226,16 +208,9 @@
   <h1>Fernsteuerung</h1>
   <p>Code vom gelben Badge neben 🎮 in der Präsentation eingeben</p>
 
-  <input
-    class="code-input"
-    id="code-input"
-    type="text"
-    maxlength="4"
-    placeholder="····"
-    oninput="onCodeInput(this)"
-    autocomplete="off"
-    spellcheck="false"
-  >
+  <input class="code-input" id="code-input" type="text" maxlength="4"
+    placeholder="····" oninput="onCodeInput(this)"
+    autocomplete="off" spellcheck="false">
 
   <div class="error-msg" id="code-error">Code nicht gefunden — Präsentation muss geöffnet sein.</div>
 
@@ -248,12 +223,13 @@
 
 <!-- SCREEN 2: ACTIVE CONTROL -->
 <div class="screen" id="screen-control">
-  <div style="width:100%; display:flex; align-items:center; justify-content:space-between;">
+
+  <div style="width:100%;display:flex;align-items:center;justify-content:space-between;">
     <span>
       <span class="status-dot connected" id="ctrl-dot"></span>
       <span class="status-text" id="ctrl-status">Verbunden</span>
     </span>
-    <span class="status-text" id="ctrl-code-display" style="color:#fbbf24; font-weight:700; font-family:monospace;"></span>
+    <span class="status-text" id="ctrl-code-display" style="color:#fbbf24;font-weight:700;font-family:monospace;"></span>
   </div>
 
   <div class="slide-info">
@@ -261,6 +237,7 @@
     <div class="slide-title-display" id="ctrl-slide-title">—</div>
   </div>
 
+  <!-- Navigation -->
   <div class="ctrl-grid">
     <button class="ctrl-btn btn-prev" ontouchstart="sendCmd('prev')" onclick="sendCmd('prev')">
       ← <small>Zurück</small>
@@ -273,20 +250,23 @@
     </button>
   </div>
 
-  <div class="section-label-row">Direkt zu Beruf</div>
-
+  <!-- Beruf-Auswahl -->
+  <div class="row-label">Direkt zu Beruf</div>
   <div class="beruf-grid">
     <button class="beruf-btn btn-auto" ontouchstart="sendGoto('auto')" onclick="sendGoto('auto')">
-      <span class="beruf-icon">🔧</span>Automatiker
-    </button>
-    <button class="beruf-btn btn-info" ontouchstart="sendGoto('info')" onclick="sendGoto('info')">
-      <span class="beruf-icon">💻</span>Informatiker
+      <span class="bi">🔧</span>Automatiker
     </button>
     <button class="beruf-btn btn-elek" ontouchstart="sendGoto('elek')" onclick="sendGoto('elek')">
-      <span class="beruf-icon">⚡</span>Elektroniker
+      <span class="bi">⚡</span>Elektroniker
+    </button>
+    <button class="beruf-btn btn-info-app" ontouchstart="sendInfoGoto('app')" onclick="sendInfoGoto('app')">
+      <span class="bi">💻</span>Info — App-Entw.
+    </button>
+    <button class="beruf-btn btn-info-plat" ontouchstart="sendInfoGoto('plattform')" onclick="sendInfoGoto('plattform')">
+      <span class="bi">🖥️</span>Info — Plattform
     </button>
     <button class="beruf-btn btn-ki" ontouchstart="sendGoto('ki')" onclick="sendGoto('ki')">
-      <span class="beruf-icon">🤖</span>KI &amp; Zukunft
+      <span class="bi">🤖</span>KI &amp; Zukunft
     </button>
   </div>
 
@@ -306,7 +286,6 @@ const FIREBASE_CONFIG = {
 
 let db = null;
 let sessionRef = null;
-let connectedCode = null;
 let lastCmdTs = 0;
 
 function loadScript(src) {
@@ -345,13 +324,12 @@ async function connect() {
     const snap = await db.ref('sessions/' + code + '/alive').get();
 
     if (!snap.exists() || !snap.val()) {
-      document.getElementById('code-error').classList.add('show');
+      showError('Code nicht gefunden — Präsentation muss geöffnet sein.');
       btn.disabled = false;
       btn.textContent = 'Verbinden →';
       return;
     }
 
-    connectedCode = code;
     sessionRef = db.ref('sessions/' + code);
     document.getElementById('ctrl-code-display').textContent = code;
     showScreen('screen-control');
@@ -362,14 +340,13 @@ async function connect() {
     });
 
     sessionRef.child('alive').on('value', snap => {
-      const alive = snap.val();
+      const alive = !!snap.val();
       document.getElementById('ctrl-dot').className = alive ? 'status-dot connected' : 'status-dot error';
       document.getElementById('ctrl-status').textContent = alive ? 'Verbunden' : 'Präsentation getrennt';
     });
 
   } catch(e) {
-    document.getElementById('code-error').classList.add('show');
-    document.getElementById('code-error').textContent = 'Verbindungsfehler. Nochmals versuchen.';
+    showError('Verbindungsfehler. Nochmals versuchen.');
     btn.disabled = false;
     btn.textContent = 'Verbinden →';
   }
@@ -381,10 +358,7 @@ function sendCmd(action) {
   lastCmdTs = now;
   if (!sessionRef) return;
   sessionRef.child('command').set({ action, ts: now });
-
-  const btnMap = { prev: '.btn-prev', next: '.btn-next', hub: '.btn-hub' };
-  const btn = document.querySelector(btnMap[action]);
-  if (btn) { btn.style.opacity = '0.5'; setTimeout(() => { btn.style.opacity = ''; }, 200); }
+  flash(action === 'prev' ? '.btn-prev' : action === 'next' ? '.btn-next' : '.btn-hub');
 }
 
 function sendGoto(section) {
@@ -393,20 +367,37 @@ function sendGoto(section) {
   lastCmdTs = now;
   if (!sessionRef) return;
   sessionRef.child('command').set({ action: 'goto', section, ts: now });
+  flash('.btn-' + section);
+}
 
-  const sectionMap = { auto: '.btn-auto', info: '.btn-info', elek: '.btn-elek', ki: '.btn-ki' };
-  const btn = document.querySelector(sectionMap[section]);
-  if (btn) { btn.style.opacity = '0.5'; setTimeout(() => { btn.style.opacity = ''; }, 200); }
+function sendInfoGoto(spec) {
+  const now = Date.now();
+  if (now - lastCmdTs < 300) return;
+  lastCmdTs = now;
+  if (!sessionRef) return;
+  sessionRef.child('command').set({ action: 'goto', section: 'info', spec, ts: now });
+  flash(spec === 'app' ? '.btn-info-app' : '.btn-info-plat');
+}
+
+function flash(selector) {
+  const el = document.querySelector(selector);
+  if (!el) return;
+  el.style.opacity = '0.5';
+  setTimeout(() => { el.style.opacity = ''; }, 200);
+}
+
+function showError(msg) {
+  const el = document.getElementById('code-error');
+  el.textContent = msg;
+  el.classList.add('show');
 }
 
 function disconnect() {
   if (sessionRef) { sessionRef.off(); sessionRef = null; }
-  connectedCode = null;
   document.getElementById('code-input').value = '';
   document.getElementById('connect-btn').disabled = true;
-  document.getElementById('code-error').classList.remove('show');
-  document.getElementById('code-error').textContent = 'Code nicht gefunden — Präsentation muss geöffnet sein.';
   document.getElementById('connect-btn').textContent = 'Verbinden →';
+  document.getElementById('code-error').classList.remove('show');
   showScreen('screen-entry');
   setTimeout(() => document.getElementById('code-input').focus(), 100);
 }
