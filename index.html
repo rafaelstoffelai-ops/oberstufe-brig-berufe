@@ -2087,6 +2087,7 @@
         if (data.action === 'next') navigate(1);
         else if (data.action === 'prev') navigate(-1);
         else if (data.action === 'hub') goToHub();
+        else if (data.action === 'goto' && data.section) goToSection(data.section);
       });
 
       broadcastState();
