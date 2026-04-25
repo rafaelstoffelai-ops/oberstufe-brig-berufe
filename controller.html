@@ -35,82 +35,7 @@
 
     .logo { font-size: 56px; line-height: 1; }
 
-    /* Role buttons */
-    .role-btn {
-      width: 100%;
-      padding: 24px;
-      border-radius: 20px;
-      border: none;
-      cursor: pointer;
-      font-size: 20px;
-      font-weight: 700;
-      transition: transform 0.15s, opacity 0.15s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-    }
-    .role-btn:active { transform: scale(0.97); opacity: 0.85; }
-    .role-presenter { background: #2563eb; color: #fff; }
-    .role-controller { background: #16a34a; color: #fff; }
-    .role-btn small { font-size: 14px; font-weight: 400; opacity: 0.85; }
-
-    /* Code display */
-    .session-code {
-      font-size: 72px;
-      font-weight: 900;
-      letter-spacing: 12px;
-      color: #fbbf24;
-      font-variant-numeric: tabular-nums;
-      padding: 16px 24px;
-      background: #1e293b;
-      border-radius: 16px;
-      border: 2px solid #334155;
-    }
-
-    .slide-info {
-      background: #1e293b;
-      border-radius: 16px;
-      padding: 20px 24px;
-      width: 100%;
-      border: 1px solid #334155;
-    }
-    .slide-info .section-label {
-      font-size: 13px;
-      color: #64748b;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 6px;
-    }
-    .slide-info .slide-title-display {
-      font-size: 20px;
-      font-weight: 700;
-      color: #f1f5f9;
-    }
-
-    /* Status dot */
-    .status-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #64748b;
-      display: inline-block;
-      margin-right: 8px;
-      transition: background 0.3s;
-    }
-    .status-dot.connected { background: #22c55e; animation: pulse-dot 2s infinite; }
-    .status-dot.error { background: #ef4444; }
-    @keyframes pulse-dot {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-    .status-text { font-size: 14px; color: #64748b; }
-
     /* Code input */
-    .code-input-wrap {
-      width: 100%;
-      position: relative;
-    }
     .code-input {
       width: 100%;
       padding: 20px 24px;
@@ -144,6 +69,44 @@
     .connect-btn:hover { background: #1d4ed8; }
     .connect-btn:active { transform: scale(0.97); }
     .connect-btn:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
+
+    /* Status */
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #64748b;
+      display: inline-block;
+      margin-right: 8px;
+      transition: background 0.3s;
+    }
+    .status-dot.connected { background: #22c55e; animation: pulse-dot 2s infinite; }
+    .status-dot.error { background: #ef4444; }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .status-text { font-size: 14px; color: #64748b; }
+
+    .slide-info {
+      background: #1e293b;
+      border-radius: 16px;
+      padding: 20px 24px;
+      width: 100%;
+      border: 1px solid #334155;
+    }
+    .slide-info .section-label {
+      font-size: 13px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    .slide-info .slide-title-display {
+      font-size: 20px;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
 
     /* Control buttons */
     .ctrl-grid {
@@ -194,7 +157,6 @@
     }
     .disconnect-btn:hover { color: #ef4444; }
 
-    /* Error message */
     .error-msg {
       background: #450a0a;
       border: 1px solid #ef4444;
@@ -207,124 +169,49 @@
     }
     .error-msg.show { display: block; }
 
-    /* Config warning */
-    .config-warning {
-      background: #451a03;
-      border: 2px solid #f97316;
-      border-radius: 16px;
-      padding: 20px 24px;
-      font-size: 14px;
-      color: #fdba74;
-      width: 100%;
-      text-align: left;
-      line-height: 1.6;
-    }
-    .config-warning h3 { font-size: 16px; margin-bottom: 10px; color: #fb923c; }
-    .config-warning code {
-      background: rgba(0,0,0,0.3);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-family: monospace;
+    .hint {
       font-size: 13px;
+      color: #475569;
+      line-height: 1.6;
     }
   </style>
 </head>
 <body>
 
-<!-- ============================
-     SCREEN 1: ROLE SELECTION
-============================ -->
-<div class="screen active" id="screen-role">
+<!-- SCREEN 1: CODE ENTRY -->
+<div class="screen active" id="screen-entry">
   <div class="logo">🎮</div>
   <h1>Fernsteuerung</h1>
-  <p>Oberstufe Brig — Berufsvorstellung</p>
+  <p>Code vom gelben Badge neben 🎮 in der Präsentation eingeben</p>
 
-  <div id="config-check" class="config-warning" style="display:none">
-    <h3>⚠️ Firebase nicht konfiguriert</h3>
-    Firebase ist noch nicht eingerichtet. Die Fernsteuerung funktioniert nur im gleichen
-    Browser (Tab-zu-Tab via BroadcastChannel).<br><br>
-    <strong>Für echte Cross-Device-Steuerung:</strong> Firebase konfigurieren in
-    <code>firebase-config.js</code>
-    (Anleitung: <code>push/FIREBASE-SETUP.md</code>)
-  </div>
+  <input
+    class="code-input"
+    id="code-input"
+    type="text"
+    maxlength="4"
+    placeholder="····"
+    oninput="onCodeInput(this)"
+    autocomplete="off"
+    spellcheck="false"
+  >
 
-  <button class="role-btn role-presenter" onclick="chooseRole('presenter')">
-    🖥️ Presenter
-    <small>Laptop — generiert Session-Code</small>
-  </button>
-  <button class="role-btn role-controller" onclick="chooseRole('controller')">
-    📱 Controller
-    <small>Handy — steuert mit Code</small>
-  </button>
-</div>
+  <div class="error-msg" id="code-error">Code nicht gefunden — Präsentation muss geöffnet sein.</div>
 
-<!-- ============================
-     SCREEN 2: PRESENTER
-============================ -->
-<div class="screen" id="screen-presenter">
-  <div class="logo">🖥️</div>
-  <h2>Presenter-Modus</h2>
-  <p>Teile diesen Code mit dem Handy:</p>
-
-  <div class="session-code" id="presenter-code">----</div>
-
-  <div>
-    <span class="status-dot" id="presenter-dot"></span>
-    <span class="status-text" id="presenter-status">Warte auf Controller...</span>
-  </div>
-
-  <div class="slide-info">
-    <div class="section-label">Aktueller Slide</div>
-    <div class="slide-title-display" id="presenter-slide-title">—</div>
-  </div>
-
-  <p style="font-size:13px; color:#475569">
-    Öffne auf dem Handy: <strong style="color:#94a3b8">dieselbe URL mit /controller.html</strong>
-  </p>
-
-  <button class="disconnect-btn" onclick="goBack()">← Zurück</button>
-</div>
-
-<!-- ============================
-     SCREEN 3: CONTROLLER (code entry)
-============================ -->
-<div class="screen" id="screen-code-entry">
-  <div class="logo">📱</div>
-  <h2>Session-Code eingeben</h2>
-  <p>4-stelliger Code vom Presenter-Gerät</p>
-
-  <div class="code-input-wrap">
-    <input
-      class="code-input"
-      id="code-input"
-      type="text"
-      maxlength="4"
-      placeholder="····"
-      oninput="onCodeInput(this)"
-      autocomplete="off"
-      spellcheck="false"
-    >
-  </div>
-
-  <div class="error-msg" id="code-error">Code nicht gefunden. Bitte nochmals prüfen.</div>
-
-  <button class="connect-btn" id="connect-btn" onclick="connectAsController()" disabled>
+  <button class="connect-btn" id="connect-btn" onclick="connect()" disabled>
     Verbinden →
   </button>
 
-  <button class="disconnect-btn" onclick="goBack()">← Zurück</button>
+  <p class="hint">Öffne zuerst die Präsentation auf dem Laptop,<br>dann erscheint der Code neben dem 🎮 Symbol.</p>
 </div>
 
-<!-- ============================
-     SCREEN 4: CONTROLLER (active)
-============================ -->
+<!-- SCREEN 2: ACTIVE CONTROL -->
 <div class="screen" id="screen-control">
   <div style="width:100%; display:flex; align-items:center; justify-content:space-between;">
     <span>
       <span class="status-dot connected" id="ctrl-dot"></span>
       <span class="status-text" id="ctrl-status">Verbunden</span>
     </span>
-    <span class="status-text" id="ctrl-code-display" style="color:#fbbf24; font-weight:700"></span>
+    <span class="status-text" id="ctrl-code-display" style="color:#fbbf24; font-weight:700; font-family:monospace;"></span>
   </div>
 
   <div class="slide-info">
@@ -333,30 +220,21 @@
   </div>
 
   <div class="ctrl-grid">
-    <button class="ctrl-btn btn-prev" ontouchstart="sendCommand('prev')" onclick="sendCommand('prev')">
+    <button class="ctrl-btn btn-prev" ontouchstart="sendCmd('prev')" onclick="sendCmd('prev')">
       ← <small>Zurück</small>
     </button>
-    <button class="ctrl-btn btn-next" ontouchstart="sendCommand('next')" onclick="sendCommand('next')">
+    <button class="ctrl-btn btn-next" ontouchstart="sendCmd('next')" onclick="sendCmd('next')">
       → <small>Weiter</small>
     </button>
-    <button class="ctrl-btn btn-hub" ontouchstart="sendCommand('hub')" onclick="sendCommand('hub')">
+    <button class="ctrl-btn btn-hub" ontouchstart="sendCmd('hub')" onclick="sendCmd('hub')">
       🏠 Hub
     </button>
   </div>
 
-  <button class="disconnect-btn" onclick="disconnectController()">Trennen</button>
+  <button class="disconnect-btn" onclick="disconnect()">Trennen</button>
 </div>
 
-<!-- ============================
-     FIREBASE SDK
-     Wird geladen wenn konfiguriert
-============================ -->
 <script>
-// ============================================================
-// FIREBASE CONFIG
-// Ersetze diese Werte mit deinen Firebase-Projektdaten.
-// Anleitung: push/FIREBASE-SETUP.md
-// ============================================================
 const FIREBASE_CONFIG = {
   apiKey:            "AIzaSyCcQZevTe_GufEUaGhqsOESRZXqu6YZM90",
   authDomain:        "oberstufe-brig-2026.firebaseapp.com",
@@ -367,83 +245,27 @@ const FIREBASE_CONFIG = {
   appId:             "1:940814987830:web:da863d92c96b77c7839e97"
 };
 
-const FIREBASE_CONFIGURED = !FIREBASE_CONFIG.apiKey.startsWith("REPLACE");
+let db = null;
+let sessionRef = null;
+let connectedCode = null;
+let lastCmdTs = 0;
 
-// ============================================================
-// BROADCAST CHANNEL (Fallback: gleicher Browser, anderer Tab)
-// ============================================================
-let bc = null;
-try { bc = new BroadcastChannel('praesentation_brig_2026'); } catch(e) {}
-
-// ============================================================
-// STATE
-// ============================================================
-let currentRole = null;       // 'presenter' | 'controller'
-let sessionCode = null;       // 4-digit string
-let firebaseDb = null;        // Firebase DB ref
-let sessionRef = null;        // DB ref for this session
-let listenerUnsubscribes = []; // cleanup functions
-
-// ============================================================
-// INIT
-// ============================================================
-function init() {
-  if (!FIREBASE_CONFIGURED) {
-    document.getElementById('config-check').style.display = 'block';
-  }
-}
-init();
-
-// ============================================================
-// ROLE SELECTION
-// ============================================================
-function chooseRole(role) {
-  currentRole = role;
-
-  if (role === 'presenter') {
-    sessionCode = generateCode();
-    document.getElementById('presenter-code').textContent = sessionCode;
-    document.getElementById('ctrl-code-display').textContent = sessionCode;
-    showScreen('screen-presenter');
-
-    if (FIREBASE_CONFIGURED) {
-      initFirebase().then(() => {
-        setupPresenterFirebase();
-      });
-    } else {
-      setupPresenterBroadcast();
-    }
-  } else {
-    showScreen('screen-code-entry');
-    setTimeout(() => document.getElementById('code-input').focus(), 100);
-  }
+function loadScript(src) {
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = src; s.onload = res; s.onerror = rej;
+    document.head.appendChild(s);
+  });
 }
 
-function goBack() {
-  cleanup();
-  currentRole = null;
-  sessionCode = null;
-  document.getElementById('code-input').value = '';
-  document.getElementById('connect-btn').disabled = true;
-  document.getElementById('code-error').classList.remove('show');
-  showScreen('screen-role');
+async function initFirebase() {
+  if (db) return;
+  await loadScript('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
+  await loadScript('https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js');
+  if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+  db = firebase.database();
 }
 
-// ============================================================
-// CODE GENERATION
-// ============================================================
-function generateCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no ambiguous chars
-  let code = '';
-  for (let i = 0; i < 4; i++) {
-    code += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return code;
-}
-
-// ============================================================
-// CODE INPUT HANDLING
-// ============================================================
 function onCodeInput(input) {
   const val = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
   input.value = val;
@@ -451,209 +273,79 @@ function onCodeInput(input) {
   document.getElementById('code-error').classList.remove('show');
 }
 
-// ============================================================
-// FIREBASE INITIALIZATION
-// ============================================================
-async function initFirebase() {
-  if (firebaseDb) return; // already initialized
-
-  // Load Firebase SDK dynamically
-  await loadScript('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
-  await loadScript('https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js');
-
-  if (!firebase.apps.length) {
-    firebase.initializeApp(FIREBASE_CONFIG);
-  }
-  firebaseDb = firebase.database();
-}
-
-function loadScript(src) {
-  return new Promise((resolve, reject) => {
-    const s = document.createElement('script');
-    s.src = src;
-    s.onload = resolve;
-    s.onerror = reject;
-    document.head.appendChild(s);
-  });
-}
-
-// ============================================================
-// PRESENTER — FIREBASE MODE
-// ============================================================
-function setupPresenterFirebase() {
-  sessionRef = firebaseDb.ref(`sessions/${sessionCode}`);
-
-  // Write session alive marker
-  sessionRef.child('alive').set(true);
-  sessionRef.child('alive').onDisconnect().remove();
-
-  // Listen for commands from controller
-  const cmdRef = sessionRef.child('command');
-  cmdRef.on('value', snap => {
-    const data = snap.val();
-    if (!data) return;
-
-    // Forward to presentation via BroadcastChannel
-    if (bc) {
-      bc.postMessage(data.action);
-    }
-
-    // Update status
-    document.getElementById('presenter-dot').className = 'status-dot connected';
-    document.getElementById('presenter-status').textContent = 'Controller verbunden ✓';
-  });
-
-  // Listen for state updates from presentation
-  if (bc) {
-    bc.onmessage = (e) => {
-      if (e.data && e.data.type === 'stateUpdate') {
-        const state = e.data.state;
-        sessionRef.child('state').set(state);
-        document.getElementById('presenter-slide-title').textContent =
-          state.slideTitle || state.section || '—';
-      }
-    };
-  }
-}
-
-// ============================================================
-// PRESENTER — BROADCAST FALLBACK
-// ============================================================
-function setupPresenterBroadcast() {
-  document.getElementById('presenter-dot').className = 'status-dot connected';
-  document.getElementById('presenter-status').textContent = 'Nur gleicher Browser (kein Firebase)';
-
-  if (bc) {
-    bc.onmessage = (e) => {
-      if (e.data && e.data.type === 'stateUpdate') {
-        document.getElementById('presenter-slide-title').textContent =
-          e.data.state?.slideTitle || '—';
-      }
-    };
-  }
-}
-
-// ============================================================
-// CONTROLLER — CONNECT
-// ============================================================
-async function connectAsController() {
+async function connect() {
   const code = document.getElementById('code-input').value.toUpperCase();
   if (code.length < 4) return;
 
-  document.getElementById('connect-btn').disabled = true;
-  document.getElementById('connect-btn').textContent = 'Verbinde...';
+  const btn = document.getElementById('connect-btn');
+  btn.disabled = true;
+  btn.textContent = 'Verbinde...';
 
-  if (FIREBASE_CONFIGURED) {
-    try {
-      await initFirebase();
-      const ref = firebaseDb.ref(`sessions/${code}/alive`);
-      const snap = await ref.get();
+  try {
+    await initFirebase();
+    const snap = await db.ref('sessions/' + code + '/alive').get();
 
-      if (!snap.exists() || !snap.val()) {
-        showCodeError();
-        return;
-      }
-
-      sessionCode = code;
-      sessionRef = firebaseDb.ref(`sessions/${code}`);
-      showScreen('screen-control');
-      document.getElementById('ctrl-code-display').textContent = code;
-      listenForStateFirebase();
-
-    } catch(e) {
-      showCodeError();
+    if (!snap.exists() || !snap.val()) {
+      document.getElementById('code-error').classList.add('show');
+      btn.disabled = false;
+      btn.textContent = 'Verbinden →';
+      return;
     }
-  } else {
-    // BroadcastChannel fallback
-    sessionCode = code;
-    showScreen('screen-control');
+
+    connectedCode = code;
+    sessionRef = db.ref('sessions/' + code);
     document.getElementById('ctrl-code-display').textContent = code;
-    listenForStateBroadcast();
+    showScreen('screen-control');
+
+    sessionRef.child('state').on('value', snap => {
+      const s = snap.val();
+      if (s) document.getElementById('ctrl-slide-title').textContent = s.slideTitle || s.section || '—';
+    });
+
+    sessionRef.child('alive').on('value', snap => {
+      const alive = snap.val();
+      document.getElementById('ctrl-dot').className = alive ? 'status-dot connected' : 'status-dot error';
+      document.getElementById('ctrl-status').textContent = alive ? 'Verbunden' : 'Präsentation getrennt';
+    });
+
+  } catch(e) {
+    document.getElementById('code-error').classList.add('show');
+    document.getElementById('code-error').textContent = 'Verbindungsfehler. Nochmals versuchen.';
+    btn.disabled = false;
+    btn.textContent = 'Verbinden →';
   }
 }
 
-function showCodeError() {
-  document.getElementById('code-error').classList.add('show');
-  document.getElementById('connect-btn').disabled = false;
-  document.getElementById('connect-btn').textContent = 'Verbinden →';
-}
-
-// ============================================================
-// CONTROLLER — LISTEN FOR STATE
-// ============================================================
-function listenForStateFirebase() {
-  const stateRef = sessionRef.child('state');
-  stateRef.on('value', snap => {
-    const state = snap.val();
-    if (state) {
-      document.getElementById('ctrl-slide-title').textContent =
-        state.slideTitle || state.section || '—';
-    }
-  });
-}
-
-function listenForStateBroadcast() {
-  if (bc) {
-    bc.onmessage = (e) => {
-      if (e.data && e.data.type === 'stateUpdate') {
-        document.getElementById('ctrl-slide-title').textContent =
-          e.data.state?.slideTitle || '—';
-      }
-    };
-  }
-}
-
-// ============================================================
-// CONTROLLER — SEND COMMAND
-// ============================================================
-let lastCmdTs = 0;
-function sendCommand(action) {
+function sendCmd(action) {
   const now = Date.now();
-  if (now - lastCmdTs < 300) return; // debounce 300ms
+  if (now - lastCmdTs < 300) return;
   lastCmdTs = now;
+  if (!sessionRef) return;
+  sessionRef.child('command').set({ action, ts: now });
 
-  if (FIREBASE_CONFIGURED && sessionRef) {
-    sessionRef.child('command').set({ action, ts: now });
-  } else if (bc) {
-    bc.postMessage(action);
-  }
-
-  // Visual feedback
   const btnMap = { prev: '.btn-prev', next: '.btn-next', hub: '.btn-hub' };
   const btn = document.querySelector(btnMap[action]);
-  if (btn) {
-    btn.style.opacity = '0.5';
-    setTimeout(() => { btn.style.opacity = ''; }, 200);
-  }
+  if (btn) { btn.style.opacity = '0.5'; setTimeout(() => { btn.style.opacity = ''; }, 200); }
 }
 
-// ============================================================
-// DISCONNECT
-// ============================================================
-function disconnectController() {
-  cleanup();
-  goBack();
+function disconnect() {
+  if (sessionRef) { sessionRef.off(); sessionRef = null; }
+  connectedCode = null;
+  document.getElementById('code-input').value = '';
+  document.getElementById('connect-btn').disabled = true;
+  document.getElementById('code-error').classList.remove('show');
+  document.getElementById('code-error').textContent = 'Code nicht gefunden — Präsentation muss geöffnet sein.';
+  document.getElementById('connect-btn').textContent = 'Verbinden →';
+  showScreen('screen-entry');
+  setTimeout(() => document.getElementById('code-input').focus(), 100);
 }
 
-function cleanup() {
-  listenerUnsubscribes.forEach(fn => fn());
-  listenerUnsubscribes = [];
-  if (sessionRef) {
-    try { sessionRef.off(); } catch(e) {}
-    sessionRef = null;
-  }
-  if (bc) {
-    try { bc.onmessage = null; } catch(e) {}
-  }
-}
-
-// ============================================================
-// SCREEN HELPER
-// ============================================================
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
+
+setTimeout(() => document.getElementById('code-input').focus(), 100);
 </script>
 
 </body>

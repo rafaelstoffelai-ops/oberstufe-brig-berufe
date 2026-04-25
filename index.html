@@ -1061,8 +1061,8 @@
   <span id="breadcrumb">Berufsvorstellung Oberstufe Brig</span>
   <div style="display:flex;gap:8px;align-items:center;">
     <a href="controller.html" target="_blank" id="ctrl-link" title="Fernsteuerung öffnen"
-       style="font-size:18px;text-decoration:none;opacity:0.5;transition:opacity 0.2s;padding:4px 8px;border-radius:8px;"
-       onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'">🎮</a>
+       style="font-size:18px;text-decoration:none;opacity:0.5;transition:opacity 0.2s;padding:4px 8px;border-radius:8px;display:flex;align-items:center;gap:6px;"
+       onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'">🎮<span id="session-code-badge" style="display:none;background:#fbbf24;color:#1e293b;border-radius:6px;padding:1px 8px;font-size:13px;font-weight:800;letter-spacing:2px;font-family:monospace;"></span></a>
     <button id="hub-btn" onclick="goToHub()">🏠 Hub</button>
   </div>
 </div>
@@ -2012,18 +2012,16 @@
   try { _bc = new BroadcastChannel('praesentation_brig_2026'); } catch(e) {}
 
   function broadcastState() {
-    if (!_bc) return;
     const slideEl = document.querySelector('.slide.active');
     const slideTitle = slideEl ? (slideEl.querySelector('.slide-title')?.textContent || sectionLabel[state.currentSection] || '') : '';
-    _bc.postMessage({
-      type: 'stateUpdate',
-      state: {
-        section: state.currentSection,
-        slideIndex: state.currentSlide,
-        slideTitle: slideTitle,
-        sectionLabel: sectionLabel[state.currentSection] || state.currentSection
-      }
-    });
+    const _stateData = {
+      section: state.currentSection,
+      slideIndex: state.currentSlide,
+      slideTitle: slideTitle,
+      sectionLabel: sectionLabel[state.currentSection] || state.currentSection
+    };
+    if (_bc) _bc.postMessage({ type: 'stateUpdate', state: _stateData });
+    if (_fbSessionRef) _fbSessionRef.child('state').set(_stateData);
   }
 
   if (_bc) {
@@ -2042,6 +2040,58 @@
       }
     };
   }
+
+  // ===========================
+  // FIREBASE REMOTE CONTROLLER
+  // ===========================
+  const _FB_CONFIG = {
+    apiKey:            "AIzaSyCcQZevTe_GufEUaGhqsOESRZXqu6YZM90",
+    authDomain:        "oberstufe-brig-2026.firebaseapp.com",
+    databaseURL:       "https://oberstufe-brig-2026-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId:         "oberstufe-brig-2026",
+    storageBucket:     "oberstufe-brig-2026.firebasestorage.app",
+    messagingSenderId: "940814987830",
+    appId:             "1:940814987830:web:da863d92c96b77c7839e97"
+  };
+
+  const _chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let _sessionCode = '';
+  for (let i = 0; i < 4; i++) _sessionCode += _chars[Math.floor(Math.random() * _chars.length)];
+  let _fbSessionRef = null;
+
+  (function _initFirebase() {
+    function _ls(src) {
+      return new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = src; s.onload = res; s.onerror = rej;
+        document.head.appendChild(s);
+      });
+    }
+    Promise.all([
+      _ls('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js'),
+      _ls('https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js')
+    ]).then(() => {
+      if (!firebase.apps.length) firebase.initializeApp(_FB_CONFIG);
+      const _db = firebase.database();
+      _fbSessionRef = _db.ref('sessions/' + _sessionCode);
+      _fbSessionRef.child('alive').set(true);
+      _fbSessionRef.child('alive').onDisconnect().remove();
+
+      const badge = document.getElementById('session-code-badge');
+      if (badge) { badge.textContent = _sessionCode; badge.style.display = 'inline'; }
+      document.getElementById('ctrl-link').style.opacity = '0.8';
+
+      _fbSessionRef.child('command').on('value', snap => {
+        const data = snap.val();
+        if (!data) return;
+        if (data.action === 'next') navigate(1);
+        else if (data.action === 'prev') navigate(-1);
+        else if (data.action === 'hub') goToHub();
+      });
+
+      broadcastState();
+    }).catch(() => {});
+  })();
 
   // ===========================
   // INIT
