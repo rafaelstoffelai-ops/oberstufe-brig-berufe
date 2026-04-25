@@ -16,7 +16,6 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       padding: 24px 16px;
     }
 
@@ -28,11 +27,11 @@
       width: 100%;
       max-width: 420px;
       text-align: center;
+      margin: auto;
     }
     .screen.active { display: flex; }
 
     h1 { font-size: 26px; font-weight: 800; }
-    h2 { font-size: 20px; font-weight: 700; }
     p  { color: #94a3b8; font-size: 15px; line-height: 1.5; }
     .logo { font-size: 48px; line-height: 1; }
 
@@ -78,11 +77,10 @@
       background: #64748b;
       display: inline-block;
       margin-right: 8px;
-      transition: background 0.3s;
     }
-    .status-dot.connected { background: #22c55e; animation: pulse-dot 2s infinite; }
+    .status-dot.connected { background: #22c55e; animation: pulse 2s infinite; }
     .status-dot.error     { background: #ef4444; }
-    @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.4} }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
     .status-text { font-size: 14px; color: #64748b; }
 
     .slide-info {
@@ -92,11 +90,11 @@
       width: 100%;
       border: 1px solid #334155;
     }
-    .slide-info .section-label {
-      font-size: 12px; color: #64748b;
+    .slide-info .lbl {
+      font-size: 11px; color: #64748b;
       text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;
     }
-    .slide-info .slide-title-display { font-size: 18px; font-weight: 700; }
+    .slide-info .title { font-size: 18px; font-weight: 700; }
 
     /* Nav buttons */
     .ctrl-grid {
@@ -134,7 +132,7 @@
       font-size: 18px;
     }
 
-    /* Divider */
+    /* Section label row */
     .row-label {
       width: 100%;
       font-size: 11px;
@@ -168,14 +166,41 @@
       user-select: none;
       -webkit-tap-highlight-color: transparent;
       color: #fff;
+      width: 100%;
     }
     .beruf-btn:active { transform: scale(0.93); opacity: 0.8; }
     .beruf-btn .bi { font-size: 20px; }
     .btn-auto  { background: #2563eb; }
     .btn-elek  { background: #ea580c; }
+    .btn-info  { background: #16a34a; }
     .btn-info-app  { background: #16a34a; }
     .btn-info-plat { background: #15803d; }
-    .btn-ki    { grid-column: 1 / -1; height: 62px; background: #7c3aed; font-size: 15px; flex-direction: row; gap: 8px; }
+    .btn-ki    { background: #7c3aed; height: 62px; font-size: 15px; flex-direction: row; gap: 8px; }
+
+    /* Active spec highlight */
+    .beruf-btn.spec-active { outline: 3px solid #fff; outline-offset: 2px; }
+    .beruf-btn.spec-inactive { opacity: 0.45; }
+
+    /* Info panel states */
+    #info-panel { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+    .info-choice-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+    }
+    .info-sublabel {
+      font-size: 11px;
+      color: #fbbf24;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-align: left;
+      background: #1e1a0a;
+      border: 1px solid #854d0e;
+      border-radius: 8px;
+      padding: 6px 12px;
+      width: 100%;
+    }
 
     /* Error */
     .error-msg {
@@ -229,12 +254,12 @@
       <span class="status-dot connected" id="ctrl-dot"></span>
       <span class="status-text" id="ctrl-status">Verbunden</span>
     </span>
-    <span class="status-text" id="ctrl-code-display" style="color:#fbbf24;font-weight:700;font-family:monospace;"></span>
+    <span class="status-text" id="ctrl-code" style="color:#fbbf24;font-weight:700;font-family:monospace;"></span>
   </div>
 
   <div class="slide-info">
-    <div class="section-label">Aktueller Slide</div>
-    <div class="slide-title-display" id="ctrl-slide-title">—</div>
+    <div class="lbl">Aktueller Slide</div>
+    <div class="title" id="ctrl-slide-title">—</div>
   </div>
 
   <!-- Navigation -->
@@ -259,16 +284,53 @@
     <button class="beruf-btn btn-elek" ontouchstart="sendGoto('elek')" onclick="sendGoto('elek')">
       <span class="bi">⚡</span>Elektroniker
     </button>
-    <button class="beruf-btn btn-info-app" ontouchstart="sendInfoGoto('app')" onclick="sendInfoGoto('app')">
-      <span class="bi">💻</span>Info — App-Entw.
-    </button>
-    <button class="beruf-btn btn-info-plat" ontouchstart="sendInfoGoto('plattform')" onclick="sendInfoGoto('plattform')">
-      <span class="bi">🖥️</span>Info — Plattform
-    </button>
-    <button class="beruf-btn btn-ki" ontouchstart="sendGoto('ki')" onclick="sendGoto('ki')">
-      <span class="bi">🤖</span>KI &amp; Zukunft
-    </button>
   </div>
+
+  <!-- Dynamisches Informatiker-Panel -->
+  <div id="info-panel">
+    <!-- State A: nicht in info-Sektion -->
+    <div id="info-normal">
+      <button class="beruf-btn btn-info" style="height:62px;flex-direction:row;gap:8px;font-size:15px;"
+        ontouchstart="sendGoto('info')" onclick="sendGoto('info')">
+        <span class="bi">💻</span>Informatiker
+      </button>
+    </div>
+
+    <!-- State B: auf Auswahl-Slide (info slide 0) -->
+    <div id="info-choice" style="display:none;width:100%;display:none;flex-direction:column;gap:10px;">
+      <div class="info-sublabel">💻 Welche Richtung?</div>
+      <div class="info-choice-grid">
+        <button class="beruf-btn btn-info-app" id="btn-choice-app"
+          ontouchstart="sendInfoSpec('app')" onclick="sendInfoSpec('app')">
+          <span class="bi">💻</span>App-Entw.
+        </button>
+        <button class="beruf-btn btn-info-plat" id="btn-choice-plat"
+          ontouchstart="sendInfoSpec('plattform')" onclick="sendInfoSpec('plattform')">
+          <span class="bi">🖥️</span>Plattform
+        </button>
+      </div>
+    </div>
+
+    <!-- State C: aktiv in info-Sektion (slide > 0) -->
+    <div id="info-active" style="display:none;width:100%;flex-direction:column;gap:10px;">
+      <div class="info-sublabel">💻 Informatiker — Richtung:</div>
+      <div class="info-choice-grid">
+        <button class="beruf-btn btn-info-app" id="btn-active-app"
+          ontouchstart="sendInfoSpec('app')" onclick="sendInfoSpec('app')">
+          <span class="bi">💻</span>App-Entw.
+        </button>
+        <button class="beruf-btn btn-info-plat" id="btn-active-plat"
+          ontouchstart="sendInfoSpec('plattform')" onclick="sendInfoSpec('plattform')">
+          <span class="bi">🖥️</span>Plattform
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <button class="beruf-btn btn-ki" style="width:100%;"
+    ontouchstart="sendGoto('ki')" onclick="sendGoto('ki')">
+    <span class="bi">🤖</span>KI &amp; Zukunft
+  </button>
 
   <button class="disconnect-btn" onclick="disconnect()">Trennen</button>
 </div>
@@ -314,7 +376,6 @@ function onCodeInput(input) {
 async function connect() {
   const code = document.getElementById('code-input').value.toUpperCase();
   if (code.length < 4) return;
-
   const btn = document.getElementById('connect-btn');
   btn.disabled = true;
   btn.textContent = 'Verbinde...';
@@ -322,21 +383,21 @@ async function connect() {
   try {
     await initFirebase();
     const snap = await db.ref('sessions/' + code + '/alive').get();
-
     if (!snap.exists() || !snap.val()) {
       showError('Code nicht gefunden — Präsentation muss geöffnet sein.');
-      btn.disabled = false;
-      btn.textContent = 'Verbinden →';
+      btn.disabled = false; btn.textContent = 'Verbinden →';
       return;
     }
 
     sessionRef = db.ref('sessions/' + code);
-    document.getElementById('ctrl-code-display').textContent = code;
+    document.getElementById('ctrl-code').textContent = code;
     showScreen('screen-control');
 
     sessionRef.child('state').on('value', snap => {
       const s = snap.val();
-      if (s) document.getElementById('ctrl-slide-title').textContent = s.slideTitle || s.section || '—';
+      if (!s) return;
+      document.getElementById('ctrl-slide-title').textContent = s.slideTitle || s.section || '—';
+      updateInfoPanel(s);
     });
 
     sessionRef.child('alive').on('value', snap => {
@@ -347,8 +408,37 @@ async function connect() {
 
   } catch(e) {
     showError('Verbindungsfehler. Nochmals versuchen.');
-    btn.disabled = false;
-    btn.textContent = 'Verbinden →';
+    btn.disabled = false; btn.textContent = 'Verbinden →';
+  }
+}
+
+// Shows the right info panel state based on current presentation state
+function updateInfoPanel(s) {
+  const normal = document.getElementById('info-normal');
+  const choice = document.getElementById('info-choice');
+  const active = document.getElementById('info-active');
+
+  if (s.section !== 'info') {
+    // Not in info section — show single button
+    normal.style.display = 'block';
+    choice.style.display = 'none';
+    active.style.display = 'none';
+  } else if (s.slideIndex === 0) {
+    // On the choice slide — mirror the presentation's choice screen
+    normal.style.display = 'none';
+    choice.style.display = 'flex';
+    active.style.display = 'none';
+  } else {
+    // In info section with direction active — show both buttons to switch
+    normal.style.display = 'none';
+    choice.style.display = 'none';
+    active.style.display = 'flex';
+    // Highlight current spec, dim other
+    const spec = s.infoSpec;
+    document.getElementById('btn-active-app').className =
+      'beruf-btn btn-info-app' + (spec === 'app' ? ' spec-active' : spec ? ' spec-inactive' : '');
+    document.getElementById('btn-active-plat').className =
+      'beruf-btn btn-info-plat' + (spec === 'plattform' ? ' spec-active' : spec ? ' spec-inactive' : '');
   }
 }
 
@@ -370,26 +460,25 @@ function sendGoto(section) {
   flash('.btn-' + section);
 }
 
-function sendInfoGoto(spec) {
+function sendInfoSpec(spec) {
   const now = Date.now();
   if (now - lastCmdTs < 300) return;
   lastCmdTs = now;
   if (!sessionRef) return;
-  sessionRef.child('command').set({ action: 'goto', section: 'info', spec, ts: now });
-  flash(spec === 'app' ? '.btn-info-app' : '.btn-info-plat');
+  sessionRef.child('command').set({ action: 'infospec', spec, ts: now });
+  flash(spec === 'app' ? '#btn-choice-app, #btn-active-app' : '#btn-choice-plat, #btn-active-plat');
 }
 
 function flash(selector) {
-  const el = document.querySelector(selector);
-  if (!el) return;
-  el.style.opacity = '0.5';
-  setTimeout(() => { el.style.opacity = ''; }, 200);
+  document.querySelectorAll(selector).forEach(el => {
+    el.style.opacity = '0.5';
+    setTimeout(() => { el.style.opacity = ''; }, 200);
+  });
 }
 
 function showError(msg) {
   const el = document.getElementById('code-error');
-  el.textContent = msg;
-  el.classList.add('show');
+  el.textContent = msg; el.classList.add('show');
 }
 
 function disconnect() {
@@ -398,6 +487,7 @@ function disconnect() {
   document.getElementById('connect-btn').disabled = true;
   document.getElementById('connect-btn').textContent = 'Verbinden →';
   document.getElementById('code-error').classList.remove('show');
+  updateInfoPanel({ section: null });
   showScreen('screen-entry');
   setTimeout(() => document.getElementById('code-input').focus(), 100);
 }

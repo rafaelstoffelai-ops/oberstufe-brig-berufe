@@ -2018,7 +2018,8 @@
       section: state.currentSection,
       slideIndex: state.currentSlide,
       slideTitle: slideTitle,
-      sectionLabel: sectionLabel[state.currentSection] || state.currentSection
+      sectionLabel: sectionLabel[state.currentSection] || state.currentSection,
+      infoSpec: state.infoSpecialization || null
     };
     if (_bc) _bc.postMessage({ type: 'stateUpdate', state: _stateData });
     if (_fbSessionRef) _fbSessionRef.child('state').set(_stateData);
@@ -2087,10 +2088,8 @@
         if (data.action === 'next') navigate(1);
         else if (data.action === 'prev') navigate(-1);
         else if (data.action === 'hub') goToHub();
-        else if (data.action === 'goto' && data.section) {
-          goToSection(data.section);
-          if (data.spec) setInfoSpec(data.spec);
-        }
+        else if (data.action === 'goto' && data.section) goToSection(data.section);
+        else if (data.action === 'infospec' && data.spec) setInfoSpec(data.spec);
       });
 
       broadcastState();
