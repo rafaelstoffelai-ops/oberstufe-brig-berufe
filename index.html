@@ -1,0 +1,2033 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Berufsvorstellung — Oberstufe Brig 2026</title>
+  <style>
+    /* ===========================
+       ROOT VARIABLES & RESET
+    =========================== */
+    :root {
+      --bg: #f8fafc;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      scroll-behavior: smooth;
+
+      /* Beruf-Farben */
+      --auto: #2563eb;
+      --auto-light: #dbeafe;
+      --auto-dark: #1d4ed8;
+      --info: #16a34a;
+      --info-light: #dcfce7;
+      --info-dark: #15803d;
+      --elek: #ea580c;
+      --elek-light: #ffedd5;
+      --elek-dark: #c2410c;
+      --ki: #7c3aed;
+      --ki-light: #ede9fe;
+      --ki-dark: #6d28d9;
+
+      --radius: 16px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.10);
+      --shadow-lg: 0 8px 40px rgba(0,0,0,0.15);
+
+      --transition: 300ms ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 18px;
+      line-height: 1.5;
+    }
+
+    /* ===========================
+       SLIDE SYSTEM
+    =========================== */
+    #app {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 60px 80px;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity var(--transition), transform var(--transition);
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+    }
+
+    .slide.exit-left {
+      opacity: 0;
+      transform: translateX(-40px);
+    }
+
+    /* ===========================
+       TYPOGRAPHY SCALE
+    =========================== */
+    .slide-title {
+      font-size: clamp(40px, 5vw, 64px);
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .slide-subtitle {
+      font-size: clamp(22px, 2.5vw, 32px);
+      font-weight: 500;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .slide-body {
+      font-size: clamp(20px, 2vw, 28px);
+      line-height: 1.6;
+    }
+
+    /* ===========================
+       NAVIGATION CHROME
+    =========================== */
+    #nav-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      background: rgba(248,250,252,0.90);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      z-index: 1000;
+    }
+
+    #breadcrumb {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.3px;
+    }
+
+    #hub-btn {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      background: var(--text);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 16px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    #hub-btn:hover { opacity: 0.80; }
+    #hub-btn.visible { display: flex; }
+
+    /* ===========================
+       BOTTOM CONTROLS
+    =========================== */
+    #bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      background: rgba(248,250,252,0.90);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid var(--border);
+      z-index: 1000;
+    }
+
+    #key-hint {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    #progress-dots {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: all 0.25s;
+    }
+    .dot.active {
+      width: 24px;
+      border-radius: 4px;
+      background: var(--text);
+    }
+    .dot.accent-auto { background: var(--auto); }
+    .dot.accent-info { background: var(--info); }
+    .dot.accent-elek { background: var(--elek); }
+    .dot.accent-ki   { background: var(--ki); }
+
+    #nav-arrows {
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-arrow {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      width: 40px;
+      height: 36px;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+    .nav-arrow:hover { background: var(--border); }
+    .nav-arrow:disabled { opacity: 0.3; cursor: default; }
+
+    /* ===========================
+       COMPONENTS
+    =========================== */
+
+    /* Pi Badge — diskret, nur sichtbar bei Hover über rechte obere Ecke */
+    .pi-badge {
+      position: absolute;
+      top: 68px;
+      right: 24px;
+      background: rgba(237, 233, 254, 0.85);
+      color: #5b21b6;
+      border: 1px solid #c4b5fd;
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      z-index: 10;
+      opacity: 0.3;
+      transition: opacity 0.3s ease;
+      cursor: default;
+    }
+    .pi-badge:hover {
+      opacity: 1;
+    }
+    /* Hover-Zone: unsichtbares Areal oben rechts macht Badge sichtbar */
+    .slide:has(.pi-badge):hover .pi-badge {
+      opacity: 0.75;
+    }
+    .slide .pi-badge:hover {
+      opacity: 1;
+    }
+
+    /* Presenter hint */
+    .presenter-hint {
+      background: #fef9c3;
+      border: 1px solid #fde68a;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-size: 15px;
+      color: #713f12;
+      margin-top: 20px;
+      max-width: 700px;
+      text-align: center;
+    }
+
+    /* Bullet list */
+    .bullet-list {
+      list-style: none;
+      text-align: left;
+      width: 100%;
+      max-width: 800px;
+    }
+    /* Default: items hidden (not yet in active slide) */
+    .bullet-list li {
+      font-size: clamp(20px, 2vw, 26px);
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: none;
+    }
+    .bullet-list li:last-child { border-bottom: none; }
+    .bullet-list li .icon { flex-shrink: 0; font-size: 1.2em; }
+
+    /* Only animate when the parent slide is active */
+    .slide.active .bullet-list li {
+      animation: slideInFromLeft 0.45s ease both;
+    }
+
+    @keyframes slideInFromLeft {
+      from { opacity: 0; transform: translateX(-20px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Timeline */
+    .timeline {
+      list-style: none;
+      width: 100%;
+      max-width: 720px;
+    }
+    .timeline li {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 10px 0;
+      font-size: clamp(18px, 1.8vw, 24px);
+      border-left: 3px solid var(--border);
+      padding-left: 20px;
+      margin-left: 8px;
+      position: relative;
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    .slide.active .timeline li {
+      animation: fadeInUp 0.4s ease both;
+    }
+    .timeline li::before {
+      content: '';
+      position: absolute;
+      left: -7px;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .timeline-time {
+      font-weight: 700;
+      min-width: 52px;
+      font-size: 0.85em;
+    }
+
+    /* Two-column layout */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .col-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      box-shadow: var(--shadow);
+    }
+    .col-card h3 {
+      font-size: clamp(16px, 1.6vw, 22px);
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    .col-card ul {
+      list-style: none;
+    }
+    .col-card ul li {
+      font-size: clamp(16px, 1.5vw, 20px);
+      padding: 7px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+    }
+    .col-card ul li:last-child { border-bottom: none; }
+
+    /* Career path */
+    .career-path {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      width: 100%;
+      max-width: 900px;
+      margin: 16px 0;
+    }
+    .career-step {
+      flex: 1;
+      text-align: center;
+      position: relative;
+      opacity: 0;
+      transform: translateY(28px);
+    }
+    .slide.active .career-step {
+      animation: careerStepIn 0.5s cubic-bezier(0.22,1,0.36,1) both;
+    }
+
+    @keyframes careerStepIn {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Arrow connector between career steps */
+    .career-connector {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+      font-size: 22px;
+      color: var(--text-muted);
+      opacity: 0;
+      flex-shrink: 0;
+      transition: opacity 0.3s;
+    }
+    /* Connectors fade in after steps animate */
+    .slide.active .career-connector:nth-of-type(2) { opacity: 0.5; transition-delay: 0.28s; }
+    .slide.active .career-connector:nth-of-type(4) { opacity: 0.5; transition-delay: 0.40s; }
+    .slide.active .career-connector:nth-of-type(6) { opacity: 0.5; transition-delay: 0.52s; }
+
+    .career-bubble {
+      background: var(--card-bg);
+      border: 2px solid currentColor;
+      border-radius: 12px;
+      padding: 14px 10px;
+      font-size: clamp(13px, 1.2vw, 17px);
+      font-weight: 600;
+      line-height: 1.3;
+    }
+    .career-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* Big stat / statement */
+    .big-statement {
+      font-size: clamp(22px, 2.5vw, 36px);
+      font-weight: 700;
+      text-align: center;
+      padding: 20px 32px;
+      border-radius: var(--radius);
+      max-width: 800px;
+      line-height: 1.3;
+    }
+
+    /* Info box */
+    .info-box {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px 28px;
+      box-shadow: var(--shadow);
+      max-width: 800px;
+      font-size: clamp(18px, 1.8vw, 24px);
+      text-align: center;
+    }
+
+    /* Region cards */
+    .region-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      width: 100%;
+      max-width: 860px;
+    }
+    .region-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 18px 22px;
+      box-shadow: var(--shadow);
+      font-size: clamp(16px, 1.5vw, 20px);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .region-card strong {
+      font-size: 1.05em;
+    }
+    .region-card small {
+      color: var(--text-muted);
+      font-size: 0.80em;
+    }
+
+    /* Unsplash hero image */
+    .hero-img {
+      width: 260px;
+      height: 160px;
+      object-fit: cover;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 12px;
+    }
+
+    /* ===========================
+       INTRO SLIDES
+    =========================== */
+    /* Intro-0: subtiler Gradient-Hintergrund */
+    #slide-intro-0 {
+      background: linear-gradient(175deg, #f8fafc 0%, #eff6ff 100%);
+    }
+
+    #slide-intro-1 {
+      background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
+    }
+
+    .intro-icons {
+      font-size: 72px;
+      display: flex;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    /* Jedes Icon floating mit eigener Phase und Amplitude */
+    .slide.active .intro-icons .icon-float-1 {
+      animation: floatIcon1 3.2s ease-in-out infinite;
+    }
+    .slide.active .intro-icons .icon-float-2 {
+      animation: floatIcon2 3.8s ease-in-out infinite 0.4s;
+    }
+    .slide.active .intro-icons .icon-float-3 {
+      animation: floatIcon3 3.5s ease-in-out infinite 0.8s;
+    }
+
+    @keyframes floatIcon1 {
+      0%, 100% { transform: translateY(0px) rotate(-2deg); }
+      50%       { transform: translateY(-10px) rotate(2deg); }
+    }
+    @keyframes floatIcon2 {
+      0%, 100% { transform: translateY(0px) rotate(1deg); }
+      50%       { transform: translateY(-14px) rotate(-1deg); }
+    }
+    @keyframes floatIcon3 {
+      0%, 100% { transform: translateY(0px) rotate(2deg); }
+      50%       { transform: translateY(-8px) rotate(-3deg); }
+    }
+
+    @keyframes bounceIn {
+      0%   { opacity: 0; transform: scale(0.5); }
+      70%  { transform: scale(1.1); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .proceed-hint {
+      margin-top: 32px;
+      font-size: 18px;
+      color: var(--text-muted);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.4; }
+    }
+
+    .subtitle-line {
+      font-size: clamp(24px, 2.8vw, 38px);
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .date-line {
+      font-size: 18px;
+      color: var(--text-muted);
+    }
+
+    /* ===========================
+       HUB SLIDE
+    =========================== */
+    #slide-hub {
+      background: var(--bg);
+    }
+
+    .hub-cards {
+      display: flex;
+      gap: 24px;
+      width: 100%;
+      max-width: 1000px;
+      margin: 24px 0;
+    }
+
+    .hub-card {
+      flex: 1;
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      border: 3px solid transparent;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.3s;
+      position: relative;
+      text-align: center;
+    }
+    .hub-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: var(--shadow-lg);
+    }
+    /* Farbiger Box-Shadow per Beruf beim Hover */
+    .hub-auto:hover {
+      box-shadow: 0 8px 32px rgba(37, 99, 235, 0.28), var(--shadow-lg);
+    }
+    .hub-info:hover {
+      box-shadow: 0 8px 32px rgba(22, 163, 74, 0.28), var(--shadow-lg);
+    }
+    .hub-elek:hover {
+      box-shadow: 0 8px 32px rgba(234, 88, 12, 0.28), var(--shadow-lg);
+    }
+    .hub-card .hub-icon {
+      font-size: 56px;
+      line-height: 1;
+    }
+    .hub-card .hub-name {
+      font-size: clamp(18px, 2vw, 26px);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .hub-card .hub-desc {
+      font-size: clamp(14px, 1.4vw, 18px);
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+    .hub-card.visited {
+      border-color: #22c55e;
+    }
+    .hub-card .checkmark {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 28px;
+      height: 28px;
+      background: #22c55e;
+      color: white;
+      border-radius: 50%;
+      font-size: 16px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      animation: checkPop 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    .hub-card.visited .checkmark { display: flex; }
+
+    @keyframes checkPop {
+      from { transform: scale(0); }
+      to   { transform: scale(1); }
+    }
+
+    .hub-auto { --accent: var(--auto); }
+    .hub-auto:hover, .hub-auto:focus { border-color: var(--auto); }
+    .hub-auto .hub-icon-bg { background: var(--auto-light); }
+
+    .hub-info { --accent: var(--info); }
+    .hub-info:hover, .hub-info:focus { border-color: var(--info); }
+
+    .hub-elek { --accent: var(--elek); }
+    .hub-elek:hover, .hub-elek:focus { border-color: var(--elek); }
+
+    .icon-bg {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 44px;
+      margin-bottom: 4px;
+    }
+
+    #hub-actions {
+      display: flex;
+      gap: 16px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background: var(--text);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 28px;
+      font-size: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      display: none;
+      transform-origin: center;
+    }
+    .btn-primary:hover { opacity: 0.85; transform: scale(1.03); }
+    .btn-primary.visible {
+      display: inline-block;
+      animation: bounceInBtn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    @keyframes bounceInBtn {
+      0%   { opacity: 0; transform: scale(0); }
+      60%  { opacity: 1; transform: scale(1.12); }
+      80%  { transform: scale(0.96); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .btn-secondary {
+      background: var(--ki-light);
+      color: var(--ki);
+      border: 2px solid var(--ki);
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .btn-secondary:hover { opacity: 0.85; transform: scale(1.03); }
+
+    /* ===========================
+       BERUF COLOR THEMING
+    =========================== */
+    /* Automatiker slides */
+    .slide-auto { border-top: 5px solid var(--auto); }
+    .slide-auto .slide-title { color: var(--auto); }
+    .slide-auto .dot.active { background: var(--auto); width: 24px; }
+    .slide-auto .timeline li { color: var(--auto); }
+    .slide-auto .career-bubble { color: var(--auto); }
+    .slide-auto .big-statement { background: var(--auto-light); color: var(--auto-dark); }
+
+    /* Informatiker slides */
+    .slide-info { border-top: 5px solid var(--info); }
+    .slide-info .slide-title { color: var(--info); }
+    .slide-info .timeline li { color: var(--info); }
+    .slide-info .career-bubble { color: var(--info); }
+    .slide-info .big-statement { background: var(--info-light); color: var(--info-dark); }
+
+    /* Elektroniker slides */
+    .slide-elek { border-top: 5px solid var(--elek); }
+    .slide-elek .slide-title { color: var(--elek); }
+    .slide-elek .timeline li { color: var(--elek); }
+    .slide-elek .career-bubble { color: var(--elek); }
+    .slide-elek .big-statement { background: var(--elek-light); color: var(--elek-dark); }
+
+    /* KI slides */
+    .slide-ki { border-top: 5px solid var(--ki); }
+    .slide-ki .slide-title { color: var(--ki); }
+    .slide-ki .big-statement { background: var(--ki-light); color: var(--ki-dark); }
+
+    /* ===========================
+       INFORMATIKER CHOICE SLIDE
+    =========================== */
+    .choice-cards {
+      display: flex;
+      gap: 28px;
+      margin: 20px 0;
+    }
+    .choice-card {
+      flex: 1;
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 36px 32px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      border: 3px solid var(--border);
+      transition: all 0.2s;
+      max-width: 380px;
+    }
+    .choice-card:hover {
+      border-color: var(--info);
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-lg);
+    }
+    .choice-card .choice-icon { font-size: 56px; margin-bottom: 16px; }
+    .choice-card h3 {
+      font-size: clamp(20px, 2vw, 28px);
+      font-weight: 800;
+      color: var(--info);
+      margin-bottom: 10px;
+    }
+    .choice-card p {
+      font-size: clamp(16px, 1.5vw, 20px);
+      color: var(--text-muted);
+    }
+
+    /* ===========================
+       KI SLIDES
+    =========================== */
+    .analogy-box {
+      background: var(--ki-light);
+      border-left: 5px solid var(--ki);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      font-size: clamp(20px, 2vw, 28px);
+      font-style: italic;
+      max-width: 800px;
+      line-height: 1.5;
+      margin: 16px 0;
+    }
+
+    .ki-fact-row {
+      display: flex;
+      gap: 16px;
+      max-width: 900px;
+      width: 100%;
+    }
+    .ki-fact {
+      flex: 1;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px 18px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      font-size: clamp(16px, 1.5vw, 20px);
+    }
+    .ki-fact .ki-icon { font-size: 32px; margin-bottom: 8px; }
+    .ki-fact h4 {
+      font-weight: 700;
+      margin-bottom: 6px;
+      font-size: clamp(16px, 1.5vw, 20px);
+    }
+
+    /* Prompt comparison */
+    .prompt-compare {
+      display: flex;
+      gap: 20px;
+      max-width: 900px;
+      width: 100%;
+      margin: 16px 0;
+    }
+    .prompt-box {
+      flex: 1;
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      font-size: clamp(16px, 1.5vw, 20px);
+    }
+    .prompt-box.bad {
+      background: #fee2e2;
+      border: 2px solid #fca5a5;
+      color: #991b1b;
+    }
+    .prompt-box.good {
+      background: #dcfce7;
+      border: 2px solid #86efac;
+      color: #14532d;
+    }
+    .prompt-box h4 { font-weight: 700; margin-bottom: 10px; font-size: 1.1em; }
+    .prompt-box code {
+      display: block;
+      background: rgba(0,0,0,0.08);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-top: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85em;
+      line-height: 1.5;
+    }
+
+    /* KI 3-col */
+    .ki-three-col {
+      display: flex;
+      gap: 18px;
+      max-width: 1000px;
+      width: 100%;
+    }
+    .ki-col {
+      flex: 1;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 22px 18px;
+      box-shadow: var(--shadow);
+      font-size: clamp(14px, 1.3vw, 18px);
+    }
+    .ki-col h3 {
+      font-size: clamp(16px, 1.5vw, 20px);
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .ki-col ul { list-style: none; }
+    .ki-col ul li { padding: 6px 0; border-bottom: 1px solid var(--border); }
+    .ki-col ul li:last-child { border-bottom: none; }
+
+    /* Risk badges */
+    .risk-row {
+      display: flex;
+      gap: 28px;
+      margin: 20px 0;
+    }
+    .risk-item {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .risk-icon { font-size: 48px; }
+    .risk-label { font-size: 18px; font-weight: 600; }
+    .risk-badge {
+      background: #dcfce7;
+      color: #15803d;
+      border-radius: 20px;
+      padding: 4px 16px;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    /* Auto-scenario (K2 interactive) */
+    .scenario-box {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      max-width: 760px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      font-size: clamp(18px, 1.8vw, 24px);
+      line-height: 1.5;
+      margin: 16px 0;
+    }
+    .reveal-btn {
+      background: var(--ki);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 24px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 16px;
+      transition: opacity 0.2s;
+    }
+    .reveal-btn:hover { opacity: 0.85; }
+    .reveal-content {
+      display: none;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 2px dashed var(--border);
+    }
+    .reveal-content.show { display: block; }
+
+    /* Warning box */
+    .warning-box {
+      background: #fef3c7;
+      border: 2px solid #fbbf24;
+      border-radius: var(--radius);
+      padding: 16px 22px;
+      font-size: clamp(16px, 1.5vw, 20px);
+      color: #78350f;
+      max-width: 700px;
+      width: 100%;
+      text-align: center;
+    }
+
+    /* Links row */
+    .links-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 12px;
+    }
+    .link-chip {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 6px 18px;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    /* Abschluss */
+    .big-question {
+      font-size: clamp(80px, 12vw, 160px);
+      line-height: 1;
+      margin: 16px 0;
+      animation: bounceIn 0.8s ease both;
+    }
+
+    /* Contact placeholder */
+    .contact-placeholder {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px 32px;
+      box-shadow: var(--shadow);
+      font-size: clamp(18px, 1.8vw, 24px);
+      color: var(--text-muted);
+      text-align: center;
+      border: 2px dashed var(--border);
+    }
+
+    /* Staggered animation delays for list items */
+    .slide.active .bullet-list li:nth-child(1) { animation-delay: 0.05s; }
+    .slide.active .bullet-list li:nth-child(2) { animation-delay: 0.17s; }
+    .slide.active .bullet-list li:nth-child(3) { animation-delay: 0.29s; }
+    .slide.active .bullet-list li:nth-child(4) { animation-delay: 0.41s; }
+    .slide.active .bullet-list li:nth-child(5) { animation-delay: 0.53s; }
+
+    .slide.active .timeline li:nth-child(1) { animation-delay: 0.05s; }
+    .slide.active .timeline li:nth-child(2) { animation-delay: 0.13s; }
+    .slide.active .timeline li:nth-child(3) { animation-delay: 0.21s; }
+    .slide.active .timeline li:nth-child(4) { animation-delay: 0.29s; }
+    .slide.active .timeline li:nth-child(5) { animation-delay: 0.37s; }
+    .slide.active .timeline li:nth-child(6) { animation-delay: 0.45s; }
+
+    /* Career-step stagger: only when slide is active */
+    .slide.active .career-step:nth-child(1) { animation-delay: 0.10s; }
+    .slide.active .career-step:nth-child(2) { animation-delay: 0.22s; }
+    .slide.active .career-step:nth-child(3) { animation-delay: 0.34s; }
+    .slide.active .career-step:nth-child(4) { animation-delay: 0.46s; }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .hub-cards { flex-direction: column; }
+      .two-col { grid-template-columns: 1fr; }
+      .choice-cards { flex-direction: column; }
+      .ki-three-col { flex-direction: column; }
+      .prompt-compare { flex-direction: column; }
+      .career-path { flex-direction: column; gap: 8px; }
+      .career-connector { transform: rotate(90deg); }
+    }
+
+    /* Section accent line on progress dots */
+    .dot-section-auto.active { background: var(--auto) !important; }
+    .dot-section-info.active { background: var(--info) !important; }
+    .dot-section-elek.active { background: var(--elek) !important; }
+    .dot-section-ki.active   { background: var(--ki) !important; }
+
+    /* Zoom animation for hero images */
+    .zoom-hero {
+      overflow: hidden;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+    .zoom-hero img {
+      width: 300px;
+      height: 180px;
+      object-fit: cover;
+      animation: zoomIn 8s ease-in-out infinite alternate;
+    }
+    @keyframes zoomIn {
+      from { transform: scale(1); }
+      to   { transform: scale(1.12); }
+    }
+
+    /* Hub visited count */
+    #visited-count {
+      font-size: 15px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===========================
+     NAVIGATION BAR
+=========================== -->
+<div id="nav-bar">
+  <span id="breadcrumb">Berufsvorstellung Oberstufe Brig</span>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <a href="controller.html" target="_blank" id="ctrl-link" title="Fernsteuerung öffnen"
+       style="font-size:18px;text-decoration:none;opacity:0.5;transition:opacity 0.2s;padding:4px 8px;border-radius:8px;"
+       onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'">🎮</a>
+    <button id="hub-btn" onclick="goToHub()">🏠 Hub</button>
+  </div>
+</div>
+
+<!-- ===========================
+     SLIDE CONTAINER
+=========================== -->
+<div id="app">
+
+  <!-- ==================
+       INTRO 1
+  ================== -->
+  <div class="slide" id="slide-intro-0" data-section="intro" data-index="0">
+    <div class="intro-icons">
+      <span class="icon-float-1">⚙️</span>
+      <span class="icon-float-2">💻</span>
+      <span class="icon-float-3">⚡</span>
+    </div>
+    <h1 class="slide-title" style="font-size: clamp(52px,7vw,88px)">Willkommen!</h1>
+    <p class="subtitle-line">Automatiker · Informatiker · Elektroniker</p>
+    <p class="date-line">Oberstufe Brig — April 2026</p>
+    <p class="proceed-hint">→ Drücke eine Taste oder klicke um fortzufahren</p>
+  </div>
+
+  <!-- ==================
+       INTRO 2 — Vorstellung
+  ================== -->
+  <div class="slide" id="slide-intro-1" data-section="intro" data-index="1">
+    <h1 class="slide-title">Wer steht vor euch?</h1>
+    <div class="col-card" style="max-width: 600px; width: 100%; margin-top: 20px;">
+      <ul style="list-style: none;">
+        <li style="padding: 14px 0; border-bottom: 1px solid var(--border); font-size: clamp(20px,2vw,28px);">👤 <strong>[Dein Name]</strong></li>
+        <li style="padding: 14px 0; border-bottom: 1px solid var(--border); font-size: clamp(20px,2vw,28px);">🏭 [Dein Beruf / Unternehmen]</li>
+        <li style="padding: 14px 0; font-size: clamp(20px,2vw,28px);">💡 [Ein persönlicher Fakt]</li>
+      </ul>
+    </div>
+    <div class="presenter-hint">💡 Hier kurz vorstellen — 1–2 Minuten. Dann: "Welchen Beruf kennt ihr schon?" → Handzeichen</div>
+  </div>
+
+  <!-- ==================
+       HUB
+  ================== -->
+  <div class="slide" id="slide-hub" data-section="hub" data-index="0">
+    <h1 class="slide-title" style="color: var(--text);">Welchen Beruf schauen wir uns zuerst an?</h1>
+    <p id="visited-count" class="slide-subtitle">Wählt eine der drei Karten!</p>
+    <div class="hub-cards">
+      <div class="hub-card hub-auto" id="hub-auto" onclick="goToSection('auto')">
+        <div class="checkmark">✓</div>
+        <div class="icon-bg" style="background: var(--auto-light);">⚙️</div>
+        <div class="hub-name" style="color: var(--auto);">Automatiker EFZ</div>
+        <div class="hub-desc">Maschinen und Anlagen steuern, programmieren und warten</div>
+      </div>
+      <div class="hub-card hub-info" id="hub-info" onclick="goToSection('info')">
+        <div class="checkmark">✓</div>
+        <div class="icon-bg" style="background: var(--info-light);">💻</div>
+        <div class="hub-name" style="color: var(--info);">Informatiker EFZ</div>
+        <div class="hub-desc">Software entwickeln oder IT-Infrastruktur betreiben</div>
+      </div>
+      <div class="hub-card hub-elek" id="hub-elek" onclick="goToSection('elek')">
+        <div class="checkmark">✓</div>
+        <div class="icon-bg" style="background: var(--elek-light);">⚡</div>
+        <div class="hub-name" style="color: var(--elek);">Elektroniker EFZ</div>
+        <div class="hub-desc">Elektronische Geräte und Systeme entwickeln und bauen</div>
+      </div>
+    </div>
+    <div id="hub-actions">
+      <button class="btn-primary" id="btn-abschluss" onclick="goToSection('abschluss')">Zum Abschluss →</button>
+      <button class="btn-secondary" onclick="goToSection('ki')">🤖 KI &amp; Zukunft</button>
+    </div>
+    <div class="presenter-hint">💡 Schüler abstimmen lassen — dann die meistgewählte Karte anklicken</div>
+  </div>
+
+  <!-- ==========================================
+       AUTOMATIKER — 5 Slides
+  ========================================== -->
+
+  <!-- A1: Was machen Automatiker -->
+  <div class="slide slide-auto" id="slide-auto-0" data-section="auto" data-index="0">
+    <div class="pi-badge">🍓 Raspberry Pi zeigen!</div>
+    <h1 class="slide-title">Was machen Automatiker?</h1>
+    <p class="slide-subtitle">Sie bringen Maschinen zum Leben</p>
+    <ul class="bullet-list">
+      <li><span class="icon">⚙️</span> Steuerschränke verdrahten &amp; elektrische Steuerungsanlagen bauen</li>
+      <li><span class="icon">🖥️</span> Maschinen mit SPS programmieren — dem Gehirn der Anlage</li>
+      <li><span class="icon">🔧</span> Automatische Systeme in Betrieb nehmen und testen</li>
+      <li><span class="icon">🚨</span> Störungen suchen, analysieren und reparieren</li>
+      <li><span class="icon">📋</span> Sicherheitsnormen einhalten und Arbeit dokumentieren</li>
+    </ul>
+    <div class="presenter-hint">💡 Pi zeigen: "An diese GPIO-Pins schliesst man Sensoren, Motoren, Relais an — so steuern Automatiker Maschinen."</div>
+  </div>
+
+  <!-- A2: Tagesablauf -->
+  <div class="slide slide-auto" id="slide-auto-1" data-section="auto" data-index="1">
+    <h1 class="slide-title">Ein Tag als Automatiker</h1>
+    <ul class="timeline" style="color: var(--auto);">
+      <li><span class="timeline-time">07:00</span>🏭 Ankunft im Betrieb oder beim Kunden</li>
+      <li><span class="timeline-time">08:00</span>⚡ Steuerschrank verdrahten</li>
+      <li><span class="timeline-time">10:00</span>💻 SPS-Programm testen und anpassen</li>
+      <li><span class="timeline-time">13:00</span>🔍 Störung beim Kunden suchen &amp; beheben</li>
+      <li><span class="timeline-time">15:30</span>📋 Dokumentation schreiben</li>
+      <li><span class="timeline-time">17:00</span>🏠 Feierabend</li>
+    </ul>
+    <div class="info-box" style="margin-top: 16px; font-size: clamp(16px,1.6vw,22px); color: var(--auto);">
+      <strong>Kein Tag ist gleich</strong> — mal Büro, mal Baustelle, mal Fabrik
+    </div>
+  </div>
+
+  <!-- A3: Anforderungen -->
+  <div class="slide slide-auto" id="slide-auto-2" data-section="auto" data-index="2">
+    <h1 class="slide-title">Was brauchst du?</h1>
+    <div class="two-col" style="margin-top: 16px;">
+      <div class="col-card" style="border-top: 4px solid #22c55e;">
+        <h3 style="color: #15803d;">✅ Das brauchst du</h3>
+        <ul>
+          <li><span>🔩</span> Technisches Interesse</li>
+          <li><span>🧠</span> Logisches Denken</li>
+          <li><span>🖐️</span> Handgeschick</li>
+          <li><span>📐</span> Gute Noten in Mathe &amp; Physik</li>
+          <li><span>🎨</span> Farbsehvermögen (Kabelkennzeichnung)</li>
+        </ul>
+      </div>
+      <div class="col-card" style="border-top: 4px solid #ef4444;">
+        <h3 style="color: #dc2626;">❌ Das brauchst du NICHT</h3>
+        <ul>
+          <li><span>🎓</span> Gymnasium oder Matura</li>
+          <li><span>⚡</span> Vorwissen in Elektronik</li>
+          <li><span>💯</span> Perfekte Schulnoten</li>
+        </ul>
+      </div>
+    </div>
+    <div class="big-statement" style="background: var(--auto-light); color: var(--auto-dark); margin-top: 16px;">
+      Lehrzeit = Lernzeit. Du wirst ausgebildet.
+    </div>
+  </div>
+
+  <!-- A4: Karriere -->
+  <div class="slide slide-auto" id="slide-auto-3" data-section="auto" data-index="3">
+    <h1 class="slide-title">Dein Weg</h1>
+    <div class="career-path" style="margin: 20px 0;">
+      <div class="career-step">
+        <div class="career-bubble" style="color: var(--auto);">4 Jahre<br>Lehre EFZ</div>
+        <div class="career-label">Betrieb + BFO Brig/Visp</div>
+      </div>
+      <span class="career-connector">→</span>
+      <div class="career-step">
+        <div class="career-bubble" style="color: var(--auto);">Berufs­prüfung<br>Fachausweis</div>
+        <div class="career-label">Weiterbildung</div>
+      </div>
+      <span class="career-connector">→</span>
+      <div class="career-step">
+        <div class="career-bubble" style="color: var(--auto);">HF Diplom</div>
+        <div class="career-label">Systemtechnik /<br>Elektrotechnik</div>
+      </div>
+      <span class="career-connector">→</span>
+      <div class="career-step">
+        <div class="career-bubble" style="color: var(--auto);">FH Bachelor</div>
+        <div class="career-label">mit Berufsmatura</div>
+      </div>
+    </div>
+    <div class="info-box" style="margin-top: 8px;">
+      <strong>Zukunft:</strong> Robotik · Industrie 4.0 · Smarthome · Autonome Fahrzeuge<br>
+      <span style="color: var(--text-muted); font-size: 0.85em;">Alle brauchen Automatiker — gutes Salär schon nach der Lehre, steigt stark mit Erfahrung</span>
+    </div>
+  </div>
+
+  <!-- A5: Region -->
+  <div class="slide slide-auto" id="slide-auto-4" data-section="auto" data-index="4">
+    <h1 class="slide-title">Deine Chance im Oberwallis</h1>
+    <div class="region-grid" style="margin-top: 16px;">
+      <div class="region-card" style="border-left: 4px solid var(--auto);">
+        <strong>🏭 Burgener AG</strong>
+        <small>Maschinen für Lebensmittel- &amp; Pharmaindustrie — Brig</small>
+      </div>
+      <div class="region-card" style="border-left: 4px solid var(--auto);">
+        <strong>⚡ Stromag AG</strong>
+        <small>Elektrotechnik, grosser Arbeitgeber in der Region Brig</small>
+      </div>
+      <div class="region-card" style="border-left: 4px solid var(--auto);">
+        <strong>🔵 Constellium Valais SA</strong>
+        <small>Aluminiumproduktion — Steg/Gamsen</small>
+      </div>
+      <div class="region-card" style="border-left: 4px solid var(--auto);">
+        <strong>🌊 EnAlpin AG</strong>
+        <small>Energieversorger Wallis</small>
+      </div>
+    </div>
+    <div class="info-box" style="margin-top: 16px; font-size: clamp(16px,1.5vw,20px);">
+      🏫 <strong>BFO Brig &amp; Visp</strong> — Berufsfachschule Oberwallis
+    </div>
+    <div class="links-row">
+      <span class="link-chip">miini-bruefswahl.ch</span>
+      <span class="link-chip">gateway.one Wallis</span>
+      <span class="link-chip">yousty.ch</span>
+    </div>
+    <div class="presenter-hint">💡 "Kennt jemand einen dieser Betriebe?"</div>
+  </div>
+
+  <!-- ==========================================
+       INFORMATIKER — 6 Slides + Choice
+  ========================================== -->
+
+  <!-- I-CHOICE: Spezialisierung -->
+  <div class="slide slide-info" id="slide-info-0" data-section="info" data-index="0">
+    <h1 class="slide-title">Informatiker — welche Richtung?</h1>
+    <p class="slide-subtitle">Beide sind 4 Jahre EFZ — beide top!</p>
+    <div class="choice-cards">
+      <div class="choice-card" onclick="setInfoSpec('app')">
+        <div class="choice-icon">💻</div>
+        <h3>Applikationsentwicklung</h3>
+        <p>Ich baue Software, Apps und Websites</p>
+      </div>
+      <div class="choice-card" onclick="setInfoSpec('plattform')">
+        <div class="choice-icon">🖥️</div>
+        <h3>Plattformentwicklung</h3>
+        <p>Ich betreibe IT-Infrastruktur &amp; Netzwerke</p>
+      </div>
+    </div>
+    <div class="presenter-hint">💡 Schüler befragen: Wer eher Software? Wer eher Infrastruktur? Dann Karte anklicken lassen.</div>
+  </div>
+
+  <!-- I1: Was machen Informatiker (content changes by spec) -->
+  <div class="slide slide-info" id="slide-info-1" data-section="info" data-index="1">
+    <div class="pi-badge">🍓 Raspberry Pi zeigen!</div>
+    <!-- Content injected by JS based on infoSpecialization -->
+    <h1 class="slide-title" id="i1-title">Was macht ein App-Entwickler?</h1>
+    <ul class="bullet-list" id="i1-bullets">
+      <li><span class="icon">📱</span> Apps, Websites &amp; Webapplikationen programmieren</li>
+      <li><span class="icon">🔍</span> Nutzerbedürfnisse analysieren &amp; in Code umsetzen</li>
+      <li><span class="icon">🗄️</span> Datenbanken entwerfen und verwalten</li>
+      <li><span class="icon">🧪</span> Software testen und Bugs aufspüren &amp; beheben</li>
+      <li><span class="icon">🤝</span> Im Team arbeiten — agile Methoden wie Scrum</li>
+    </ul>
+    <div class="presenter-hint" id="i1-pi-hint">💡 Pi zeigen: "Auf diesem Board läuft ein vollständiges Linux-Betriebssystem — ein echter Server. Einrichten, absichern, betreiben: Plattformentwicklung."</div>
+  </div>
+
+  <!-- I2: Tagesablauf -->
+  <div class="slide slide-info" id="slide-info-2" data-section="info" data-index="2">
+    <h1 class="slide-title">Ein Tag als Informatiker</h1>
+    <p class="slide-subtitle" style="font-size: clamp(16px,1.6vw,22px);">(Applikationsentwicklung)</p>
+    <ul class="timeline" style="color: var(--info);">
+      <li><span class="timeline-time">07:30</span>☕ Daily Standup — 5 Min. Team-Meeting</li>
+      <li><span class="timeline-time">08:00</span>💻 Neues Feature programmieren</li>
+      <li><span class="timeline-time">10:00</span>👀 Code Review mit Lernenden</li>
+      <li><span class="timeline-time">13:00</span>🗄️ Datenbankdesign im Team besprechen</li>
+      <li><span class="timeline-time">14:30</span>🧪 Automatisierte Tests schreiben</li>
+      <li><span class="timeline-time">17:00</span>🏠 Feierabend — oder Home Office!</li>
+    </ul>
+    <div class="info-box" style="margin-top: 16px;">
+      <strong>Sehr oft:</strong> Home Office möglich · Remote-Arbeit weltweit
+    </div>
+  </div>
+
+  <!-- I3: Anforderungen -->
+  <div class="slide slide-info" id="slide-info-3" data-section="info" data-index="3">
+    <h1 class="slide-title">Was brauchst du?</h1>
+    <div class="two-col" style="margin-top: 16px;">
+      <div class="col-card" style="border-top: 4px solid #22c55e;">
+        <h3 style="color: #15803d;">✅ Das brauchst du</h3>
+        <ul>
+          <li><span>🖥️</span> Interesse an Computern &amp; Logik</li>
+          <li><span>📐</span> Gute Noten in Mathe &amp; Englisch</li>
+          <li><span>📚</span> Lust auf selbstständiges Lernen</li>
+          <li><span>🤝</span> Teamfähigkeit</li>
+          <li><span>🐛</span> Geduld beim Debuggen</li>
+        </ul>
+      </div>
+      <div class="col-card" style="border-top: 4px solid #ef4444;">
+        <h3 style="color: #dc2626;">❌ Das brauchst du NICHT</h3>
+        <ul>
+          <li><span>💾</span> Programmierkenntnisse vorher</li>
+          <li><span>🔧</span> Handwerkliches Geschick</li>
+          <li><span>🎓</span> Matura / Gymnasium</li>
+        </ul>
+      </div>
+    </div>
+    <div class="big-statement" style="background: var(--info-light); color: var(--info-dark); margin-top: 16px; font-size: clamp(18px,1.8vw,24px);">
+      Fast jede Branche sucht Informatiker — Banken, Spitäler, Startups, Industrie, Medien
+    </div>
+  </div>
+
+  <!-- I4: Karriere -->
+  <div class="slide slide-info" id="slide-info-4" data-section="info" data-index="4">
+    <h1 class="slide-title">Dein Weg</h1>
+    <div class="career-path" style="margin: 20px 0;">
+      <div class="career-step">
+        <div class="career-bubble" style="color: var(--info);">4 Jahre<br>Lehre EFZ</div>
+        <div class="career-label">BFO Brig / Visp</div>
+      </div>
+      <span class="career-connector">→</span>
+      <div class="career-step">
+        <div class="career-bubble" style="color: var(--info);">BP-Zertifikate</div>
+        <div class="career-label">ICT App Dev · Cyber­security · Netzwerk</div>
+      </div>
+      <span class="career-connector">→</span>
+      <div class="career-step">
+        <div class="career-bubble" style="color: var(--info);">HF Techniker</div>
+        <div class="career-label">Informatik / Business Informatik</div>
+      </div>
+      <span class="career-connector">→</span>
+      <div class="career-step">
+        <div class="career-bubble" style="color: var(--info);">FH Bachelor</div>
+        <div class="career-label">Computer Science · Data Science · Cybersecurity</div>
+      </div>
+    </div>
+    <div class="info-box" style="margin-top: 8px;">
+      <strong>Einer der bestbezahltesten EFZ-Berufe.</strong> Nachfrage riesig — Lohn wächst schnell.<br>
+      <span style="color: var(--text-muted); font-size: 0.85em;">KI · Cybersecurity · Cloud — neue Spezialisierungen entstehen laufend</span>
+    </div>
+  </div>
+
+  <!-- I5: Region -->
+  <div class="slide slide-info" id="slide-info-5" data-section="info" data-index="5">
+    <h1 class="slide-title">Deine Chance im Oberwallis</h1>
+    <div class="region-grid" style="margin-top: 16px; grid-template-columns: 1fr 1fr;">
+      <div class="region-card" style="border-left: 4px solid var(--info);">
+        <strong>💻 Cortec AG Visp</strong>
+        <small>IT-Betrieb, Applikationsentwicklung, Systemintegration</small>
+      </div>
+      <div class="region-card" style="border-left: 4px solid var(--info);">
+        <strong>🏥 Spital Wallis</strong>
+        <small>IT-Infrastruktur, Plattformentwicklung, IT-Support</small>
+      </div>
+      <div class="region-card" style="border-left: 4px solid var(--info);">
+        <strong>🏦 Regionalbanken &amp; Kantonalbank</strong>
+        <small>Plattform &amp; Applikationsentwicklung</small>
+      </div>
+      <div class="region-card" style="border-left: 4px solid var(--info);">
+        <strong>🏛️ Kanton Wallis</strong>
+        <small>Kantonsverwaltung — Informatik-Lehrstellen</small>
+      </div>
+    </div>
+    <div class="info-box" style="margin-top: 16px; font-size: clamp(16px,1.5vw,20px);">
+      🏫 <strong>BFO bietet beide Richtungen an</strong> — in Brig und Visp
+    </div>
+    <div class="links-row">
+      <span class="link-chip">miini-bruefswahl.ch</span>
+      <span class="link-chip">yousty.ch</span>
+      <span class="link-chip">gateway.one Wallis</span>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       ELEKTRONIKER — 5 Slides
+  ========================================== -->
+
+  <!-- E1: Was machen Elektroniker -->
+  <div class="slide slide-elek" id="slide-elek-0" data-section="elek" data-index="0">
+    <div class="pi-badge">🍓 Raspberry Pi zeigen!</div>
+    <h1 class="slide-title">Was machen Elektroniker?</h1>
+    <p class="slide-subtitle">Sie bauen das Gehirn moderner Geräte</p>
+    <ul class="bullet-list">
+      <li><span class="icon">🔬</span> Elektronische Geräte und Systeme entwickeln, bauen und testen</li>
+      <li><span class="icon">🔧</span> Leiterkarten bestücken und löten — auch winzig kleine Komponenten</li>
+      <li><span class="icon">💾</span> Mikroprozessoren programmieren damit Geräte funktionieren</li>
+      <li><span class="icon">📐</span> Schaltpläne am Computer erstellen und simulieren</li>
+      <li><span class="icon">📊</span> Geräte messen, testen und validieren</li>
+    </ul>
+    <div class="presenter-hint">💡 Pi zeigen: "Das ist eine Platine — Widerstände, Kondensatoren, Leiterbahnen. Jemand hat das designed, gelötet, getestet. Das ist der Job eines Elektronikers."</div>
+  </div>
+
+  <!-- E2: Tagesablauf -->
+  <div class="slide slide-elek" id="slide-elek-1" data-section="elek" data-index="1">
+    <h1 class="slide-title">Ein Tag als Elektroniker</h1>
+    <ul class="timeline" style="color: var(--elek);">
+      <li><span class="timeline-time">07:00</span>🏭 Ankunft im Betrieb</li>
+      <li><span class="timeline-time">07:30</span>🔧 Leiterkarten bestücken und löten</li>
+      <li><span class="timeline-time">09:30</span>💾 Mikroprozessor-Software laden und testen</li>
+      <li><span class="timeline-time">11:00</span>📊 Messprotokoll erstellen</li>
+      <li><span class="timeline-time">13:30</span>🔍 Fehleranalyse an Prototyp</li>
+      <li><span class="timeline-time">16:00</span>📋 Dokumentation und Feierabend</li>
+    </ul>
+    <div class="info-box" style="margin-top: 16px;">
+      <strong>Oft in Labor-Umgebung</strong> · Präzisionsarbeit · Viel Messtechnik
+    </div>
+  </div>
+
+  <!-- E3: Anforderungen -->
+  <div class="slide slide-elek" id="slide-elek-2" data-section="elek" data-index="2">
+    <h1 class="slide-title">Was brauchst du?</h1>
+    <div class="two-col" style="margin-top: 16px;">
+      <div class="col-card" style="border-top: 4px solid #22c55e;">
+        <h3 style="color: #15803d;">✅ Das brauchst du</h3>
+        <ul>
+          <li><span>⚡</span> Interesse an Elektronik &amp; Physik</li>
+          <li><span>🎯</span> Präzise und sorgfältige Arbeitsweise</li>
+          <li><span>🧠</span> Logisches &amp; analytisches Denken</li>
+          <li><span>📐</span> Gute Noten in Mathe, Physik &amp; Technisches Zeichnen</li>
+          <li><span>🇬🇧</span> Grundkenntnisse Englisch (Fachbegriffe)</li>
+        </ul>
+      </div>
+      <div class="col-card" style="border-top: 4px solid #ef4444;">
+        <h3 style="color: #dc2626;">❌ Das brauchst du NICHT</h3>
+        <ul>
+          <li><span>🎓</span> Matura / Gymnasium</li>
+          <li><span>⚡</span> Vorwissen in Elektrotechnik</li>
+        </ul>
+      </div>
+    </div>
+    <div class="big-statement" style="background: var(--elek-light); color: var(--elek-dark); margin-top: 16px;">
+      Vom Smartphone bis zum Herzschrittmacher — Elektroniker bauen alles
+    </div>
+  </div>
+
+  <!-- E4: Karriere -->
+  <div class="slide slide-elek" id="slide-elek-3" data-section="elek" data-index="3">
+    <h1 class="slide-title">Dein Weg</h1>
+    <div class="career-path" style="margin: 20px 0;">
+      <div class="career-step">
+        <div class="career-bubble" style="color: var(--elek);">4 Jahre<br>Lehre EFZ</div>
+        <div class="career-label">BFO Brig / Visp</div>
+      </div>
+      <span class="career-connector">→</span>
+      <div class="career-step">
+        <div class="career-bubble" style="color: var(--elek);">BP-Zertifikate</div>
+        <div class="career-label">Prozessfachmann · Auto­matisierung</div>
+      </div>
+      <span class="career-connector">→</span>
+      <div class="career-step">
+        <div class="career-bubble" style="color: var(--elek);">HF Techniker</div>
+        <div class="career-label">Elektrotechnik / Systemtechnik</div>
+      </div>
+      <span class="career-connector">→</span>
+      <div class="career-step">
+        <div class="career-bubble" style="color: var(--elek);">FH Bachelor</div>
+        <div class="career-label">Elektrotechnik · Mikrotechnik · Medizintechnik</div>
+      </div>
+    </div>
+    <div class="info-box" style="margin-top: 8px;">
+      <strong>Spezialisierungen:</strong> Embedded Systems · Medizintechnik · E-Mobility · KI-Hardware<br>
+      <span style="color: var(--text-muted); font-size: 0.85em;">KI-Chips, Elektroautos, Pacemaker — alles braucht Elektroniker</span>
+    </div>
+  </div>
+
+  <!-- E5: Region -->
+  <div class="slide slide-elek" id="slide-elek-4" data-section="elek" data-index="4">
+    <h1 class="slide-title">Deine Chance im Oberwallis</h1>
+    <div class="region-grid" style="margin-top: 12px;">
+      <div class="region-card" style="border-left: 4px solid var(--elek);">
+        <strong>🏭 Industriebetriebe Oberwallis</strong>
+        <small>Technologiefirmen und Automatisierungsbetriebe in der Region</small>
+      </div>
+      <div class="region-card" style="border-left: 4px solid var(--elek);">
+        <strong>🔬 Medizin- &amp; Messtechnik</strong>
+        <small>Medizingeräte, Prüftechnik, Labortechnik</small>
+      </div>
+      <div class="region-card" style="border-left: 4px solid var(--elek);">
+        <strong>🔵 Constellium Valais SA</strong>
+        <small>Elektrotechnik &amp; Automatisierung in der Aluminiumproduktion</small>
+      </div>
+      <div class="region-card" style="border-left: 4px solid var(--elek);">
+        <strong>🌊 EnAlpin AG &amp; weitere</strong>
+        <small>Energietechnik, Steuerungstechnik, Leittechnik</small>
+      </div>
+    </div>
+    <div class="warning-box" style="margin-top: 12px;">
+      ⚠️ <strong>Nicht zu verwechseln</strong> mit Elektroinstallateur — das ist ein anderer Beruf!<br>
+      <span style="font-size: 0.85em;">Elektroinstallateur = Leitungen in Gebäuden · Elektroniker = Geräte &amp; Systeme entwickeln</span>
+    </div>
+    <div class="info-box" style="margin-top: 10px; font-size: clamp(16px,1.4vw,18px);">
+      🏫 <strong>BFO Brig &amp; Visp</strong>
+    </div>
+    <div class="links-row">
+      <span class="link-chip">miini-bruefswahl.ch</span>
+      <span class="link-chip">gateway.one Wallis</span>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       ABSCHLUSS — 2 Slides
+  ========================================== -->
+
+  <!-- AB1: Fragen -->
+  <div class="slide" id="slide-abschluss-0" data-section="abschluss" data-index="0">
+    <h1 class="slide-title">Habt ihr Fragen?</h1>
+    <div class="big-question">❓</div>
+    <ul class="bullet-list" style="max-width: 600px; margin-top: -8px;">
+      <li><span class="icon">⚙️</span> Zu einem der drei Berufe?</li>
+      <li><span class="icon">🏫</span> Zur Ausbildung, zur BFO, zur Lehrzeit?</li>
+      <li><span class="icon">👤</span> Zu meiner eigenen Erfahrung?</li>
+    </ul>
+    <div class="links-row" style="margin-top: 16px;">
+      <span class="link-chip" style="font-size: 18px;">🔍 miini-bruefswahl.ch</span>
+      <span class="link-chip" style="font-size: 18px;">🌐 gateway.one Wallis</span>
+      <span class="link-chip" style="font-size: 18px;">💼 yousty.ch</span>
+    </div>
+    <div class="presenter-hint">💡 "Kennt jemand jemanden in einem dieser Berufe?" — gut als Gesprächsöffner</div>
+  </div>
+
+  <!-- AB2: Danke -->
+  <div class="slide" id="slide-abschluss-1" data-section="abschluss" data-index="1">
+    <h1 class="slide-title" style="font-size: clamp(40px,5.5vw,72px);">Danke für eure Aufmerksamkeit!</h1>
+    <p class="slide-subtitle">Drei Berufe — viele Möglichkeiten</p>
+    <div class="intro-icons" style="font-size: 64px;">⚙️ 💻 ⚡</div>
+    <div class="contact-placeholder" style="margin-top: 16px;">
+      [Dein Name] · [Email oder LinkedIn]
+    </div>
+    <div style="margin-top: 20px;">
+      <button class="btn-secondary" onclick="goToSection('ki')">🤖 KI &amp; Zukunft — noch Zeit?</button>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       KI & ZUKUNFT — 5 Slides
+  ========================================== -->
+
+  <!-- K1: Was ist KI -->
+  <div class="slide slide-ki" id="slide-ki-0" data-section="ki" data-index="0">
+    <h1 class="slide-title">Was ist Künstliche Intelligenz wirklich?</h1>
+    <div class="analogy-box">
+      "Stell dir vor, du hast 1 Million Bücher gelesen — dann weisst du ziemlich gut, welches Wort als nächstes kommen könnte."
+    </div>
+    <div class="ki-fact-row" style="margin-top: 20px;">
+      <div class="ki-fact">
+        <div class="ki-icon">✅</div>
+        <h4>KI kann</h4>
+        <p>Muster erkennen in riesigen Datenmengen — das wahrscheinlichste nächste Wort oder Bild berechnen</p>
+      </div>
+      <div class="ki-fact" style="border: 2px solid #fca5a5; background: #fff5f5;">
+        <div class="ki-icon">❌</div>
+        <h4>KI hat NICHT</h4>
+        <p>Gesunden Menschenverstand · Echtes Kontextverständnis · Kausalitätswissen</p>
+      </div>
+    </div>
+    <div class="presenter-hint">💡 "Wer nutzt täglich KI?" → Handzeichen lassen</div>
+  </div>
+
+  <!-- K2: Auto-Beispiel interaktiv -->
+  <div class="slide slide-ki" id="slide-ki-1" data-section="ki" data-index="1">
+    <h1 class="slide-title">Warum KI manchmal daneben liegt</h1>
+    <div class="scenario-box">
+      <strong style="font-size: 1.1em;">Das Szenario:</strong><br><br>
+      "Das Auto muss in die Waschanlage, 300m entfernt. Wie komme ich hin?"<br><br>
+      <button class="reveal-btn" onclick="document.getElementById('ki-reveal').classList.toggle('show'); this.textContent = this.textContent.includes('zeigen') ? '✓ Aufgedeckt!' : 'KI-Antwort zeigen'">🤖 KI-Antwort zeigen</button>
+      <div class="reveal-content" id="ki-reveal">
+        <strong style="color: #dc2626;">KI antwortet:</strong> "Gehen Sie 300 Meter nach links zur Waschanlage."<br><br>
+        <strong style="color: #15803d;">Auflösung:</strong> Das <em>Auto</em> muss fahren, nicht du! KI liest Text — aber nie die Realität.
+      </div>
+    </div>
+    <div class="presenter-hint">💡 Schüler zuerst antworten lassen: "Was ist daran falsch?" — dann aufdecken</div>
+  </div>
+
+  <!-- K3: Goldene Regeln -->
+  <div class="slide slide-ki" id="slide-ki-2" data-section="ki" data-index="2">
+    <h1 class="slide-title">3 goldene Regeln</h1>
+    <div class="ki-fact-row" style="margin: 16px 0;">
+      <div class="ki-fact" style="border: 2px solid var(--ki);">
+        <div class="ki-icon">✅</div>
+        <h4>1. Fakten prüfen</h4>
+        <p>KI erfindet Quellen und Zahlen. Immer gegenchecken!</p>
+      </div>
+      <div class="ki-fact" style="border: 2px solid var(--ki);">
+        <div class="ki-icon">🎯</div>
+        <h4>2. Kontext geben</h4>
+        <p>Je mehr Details, desto bessere Antwort. KI kann nur raten was du meinst.</p>
+      </div>
+      <div class="ki-fact" style="border: 2px solid var(--ki);">
+        <div class="ki-icon">🧠</div>
+        <h4>3. Selber denken</h4>
+        <p>KI strukturiert — du verstehst. Blinder Glaube ist gefährlich.</p>
+      </div>
+    </div>
+    <div class="prompt-compare">
+      <div class="prompt-box bad">
+        <h4>❌ Schlechter Prompt</h4>
+        <code>Schreib einen Aufsatz.</code>
+        <p style="margin-top: 10px; font-size: 0.85em;">KI weiss nicht: für wen? wie lang? welches Thema?</p>
+      </div>
+      <div class="prompt-box good">
+        <h4>✅ Guter Prompt</h4>
+        <code>Schreib einen 200-Wörter Aufsatz für Schüler der 8. Klasse über Klimawandel, einfache Sprache, 3 konkrete Beispiele.</code>
+      </div>
+    </div>
+  </div>
+
+  <!-- K4: KI in den Berufen -->
+  <div class="slide slide-ki" id="slide-ki-3" data-section="ki" data-index="3">
+    <h1 class="slide-title">KI verändert diese Berufe — ersetzt sie nicht</h1>
+    <div class="ki-three-col" style="margin-top: 20px;">
+      <div class="ki-col" style="border-top: 4px solid var(--auto);">
+        <h3 style="color: var(--auto);">⚙️ Automatiker</h3>
+        <ul>
+          <li>KI-gesteuerte Maschinen brauchen mehr Automatiker</li>
+          <li>Predictive Maintenance — Ausfälle vorhersagen</li>
+          <li>Roboter einrichten und überwachen</li>
+        </ul>
+      </div>
+      <div class="ki-col" style="border-top: 4px solid var(--info);">
+        <h3 style="color: var(--info);">💻 Informatiker</h3>
+        <ul>
+          <li>GitHub Copilot schlägt Code vor — Informatiker prüft und versteht</li>
+          <li>Neue Jobs: KI-Sicherheit, Prompt Engineering</li>
+          <li>KI-Systeme administrieren und absichern</li>
+        </ul>
+      </div>
+      <div class="ki-col" style="border-top: 4px solid var(--elek);">
+        <h3 style="color: var(--elek);">⚡ Elektroniker</h3>
+        <ul>
+          <li>KI-Chips in Autos &amp; Handys müssen physisch gebaut werden</li>
+          <li>Edge AI = neue Elektronik-Designs</li>
+          <li>Sensor-Systeme für KI-Anwendungen bauen</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- K5: Werden Jobs ersetzt -->
+  <div class="slide slide-ki" id="slide-ki-4" data-section="ki" data-index="4">
+    <h1 class="slide-title">Werden diese Jobs durch KI ersetzt?</h1>
+    <div class="big-statement" style="background: var(--ki-light); color: var(--ki-dark); font-size: clamp(22px,2.5vw,38px); margin: 20px 0;">
+      NEIN — aber wer KI nicht nutzt, wird von jemandem überholt, der es tut.
+    </div>
+    <div class="risk-row" style="margin: 16px 0;">
+      <div class="risk-item">
+        <div class="risk-icon">⚙️</div>
+        <div class="risk-label">Automatiker</div>
+        <div class="risk-badge">Sehr sicher</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-icon">💻</div>
+        <div class="risk-label">Informatiker</div>
+        <div class="risk-badge">Sehr sicher</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-icon">⚡</div>
+        <div class="risk-label">Elektroniker</div>
+        <div class="risk-badge">Sehr sicher</div>
+      </div>
+    </div>
+    <div class="info-box" style="font-size: clamp(18px,1.8vw,26px); font-weight: 600; color: var(--ki);">
+      Diese drei Berufe bauen die Welt, in der KI existiert.<br>
+      <span style="font-weight: 400; color: var(--text-muted); font-size: 0.80em;">Kein Algorithmus kann löten.</span>
+    </div>
+  </div>
+
+</div><!-- end #app -->
+
+<!-- ===========================
+     BOTTOM BAR
+=========================== -->
+<div id="bottom-bar">
+  <span id="key-hint">← → navigieren &nbsp;|&nbsp; H = Hub &nbsp;|&nbsp; F = Vollbild</span>
+  <div id="progress-dots"></div>
+  <div id="nav-arrows">
+    <button class="nav-arrow" id="btn-prev" onclick="navigate(-1)" title="Zurück">←</button>
+    <button class="nav-arrow" id="btn-next" onclick="navigate(1)"  title="Weiter">→</button>
+  </div>
+</div>
+
+<!-- ===========================
+     JAVASCRIPT
+=========================== -->
+<script>
+  // ===========================
+  // STATE
+  // ===========================
+  const state = {
+    currentSection: 'intro',
+    currentSlide: 0,
+    visitedProfessions: [],   // ['auto', 'info', 'elek']
+    infoSpecialization: null, // 'app' | 'plattform'
+    presenterMode: false
+  };
+
+  // Section definitions: section key → array of slide IDs in order
+  const sections = {
+    intro:    ['slide-intro-0', 'slide-intro-1'],
+    hub:      ['slide-hub'],
+    auto:     ['slide-auto-0', 'slide-auto-1', 'slide-auto-2', 'slide-auto-3', 'slide-auto-4'],
+    info:     ['slide-info-0', 'slide-info-1', 'slide-info-2', 'slide-info-3', 'slide-info-4', 'slide-info-5'],
+    elek:     ['slide-elek-0', 'slide-elek-1', 'slide-elek-2', 'slide-elek-3', 'slide-elek-4'],
+    abschluss:['slide-abschluss-0', 'slide-abschluss-1'],
+    ki:       ['slide-ki-0', 'slide-ki-1', 'slide-ki-2', 'slide-ki-3', 'slide-ki-4']
+  };
+
+  // Accent color per section (for progress dots)
+  const sectionAccent = {
+    auto: 'var(--auto)',
+    info: 'var(--info)',
+    elek: 'var(--elek)',
+    ki:   'var(--ki)'
+  };
+
+  // Beruf label for breadcrumb
+  const sectionLabel = {
+    intro: 'Willkommen',
+    hub: 'Berufe-Hub',
+    auto: '⚙️ Automatiker EFZ',
+    info: '💻 Informatiker EFZ',
+    elek: '⚡ Elektroniker EFZ',
+    abschluss: 'Abschluss',
+    ki: '🤖 KI & Zukunft'
+  };
+
+  // Professions keys
+  const professions = ['auto', 'info', 'elek'];
+
+  // ===========================
+  // CORE NAVIGATION
+  // ===========================
+  function showSlide(section, slideIndex) {
+    // Hide all slides
+    document.querySelectorAll('.slide').forEach(el => {
+      el.classList.remove('active', 'exit-left');
+    });
+
+    state.currentSection = section;
+    state.currentSlide = slideIndex;
+
+    const slideId = sections[section][slideIndex];
+    const slideEl = document.getElementById(slideId);
+    if (slideEl) {
+      slideEl.classList.add('active');
+    }
+
+    updateNav();
+    updateProgressDots();
+    updateBreadcrumb();
+    updateHubBtn();
+    broadcastState();
+
+    // Mark profession as visited when reaching last slide
+    if (professions.includes(section)) {
+      const lastIdx = sections[section].length - 1;
+      if (slideIndex === lastIdx && !state.visitedProfessions.includes(section)) {
+        markVisited(section);
+      }
+    }
+  }
+
+  function navigate(dir) {
+    const sectionSlides = sections[state.currentSection];
+    const newIndex = state.currentSlide + dir;
+
+    if (newIndex >= 0 && newIndex < sectionSlides.length) {
+      showSlide(state.currentSection, newIndex);
+    } else if (dir > 0 && state.currentSection === 'intro' && newIndex >= sectionSlides.length) {
+      // Auto-advance from intro to hub
+      goToHub();
+    }
+  }
+
+  function goToSection(section, slideIndex = 0) {
+    showSlide(section, slideIndex);
+  }
+
+  function goToHub() {
+    showSlide('hub', 0);
+  }
+
+  // ===========================
+  // INFORMATIKER SPECIALIZATION
+  // ===========================
+  function setInfoSpec(spec) {
+    state.infoSpecialization = spec;
+    updateI1Content();
+    // Auto-advance to I1
+    showSlide('info', 1);
+  }
+
+  function updateI1Content() {
+    const titleEl = document.getElementById('i1-title');
+    const bulletsEl = document.getElementById('i1-bullets');
+
+    if (state.infoSpecialization === 'plattform') {
+      titleEl.textContent = 'Was macht ein Plattformentwickler?';
+      bulletsEl.innerHTML = `
+        <li><span class="icon">🖥️</span> Server-Infrastruktur aufbauen &amp; betreiben</li>
+        <li><span class="icon">🌐</span> Netzwerke aufbauen, konfigurieren und sichern</li>
+        <li><span class="icon">🔒</span> Systeme vor Cyberangriffen schützen</li>
+        <li><span class="icon">🤝</span> Nutzer bei IT-Problemen unterstützen</li>
+        <li><span class="icon">💾</span> Backups &amp; Datensicherheit gewährleisten</li>
+      `;
+    } else {
+      titleEl.textContent = 'Was macht ein App-Entwickler?';
+      bulletsEl.innerHTML = `
+        <li><span class="icon">📱</span> Apps, Websites &amp; Webapplikationen programmieren</li>
+        <li><span class="icon">🔍</span> Nutzerbedürfnisse analysieren &amp; in Code umsetzen</li>
+        <li><span class="icon">🗄️</span> Datenbanken entwerfen und verwalten</li>
+        <li><span class="icon">🧪</span> Software testen und Bugs aufspüren &amp; beheben</li>
+        <li><span class="icon">🤝</span> Im Team arbeiten — agile Methoden wie Scrum</li>
+      `;
+    }
+  }
+
+  // ===========================
+  // VISITED PROFESSIONS
+  // ===========================
+  function markVisited(profession) {
+    if (!state.visitedProfessions.includes(profession)) {
+      state.visitedProfessions.push(profession);
+    }
+    updateHubCards();
+    updateHubActions();
+  }
+
+  function updateHubCards() {
+    professions.forEach(p => {
+      const card = document.getElementById('hub-' + p);
+      if (!card) return;
+      if (state.visitedProfessions.includes(p)) {
+        card.classList.add('visited');
+      } else {
+        card.classList.remove('visited');
+      }
+    });
+  }
+
+  function updateHubActions() {
+    const allVisited = professions.every(p => state.visitedProfessions.includes(p));
+    const btnAbschluss = document.getElementById('btn-abschluss');
+    if (allVisited) {
+      btnAbschluss.classList.add('visible');
+    }
+    // Update visited count text
+    const countEl = document.getElementById('visited-count');
+    const n = state.visitedProfessions.length;
+    if (n === 0) {
+      countEl.textContent = 'Wählt eine der drei Karten!';
+    } else if (n < 3) {
+      countEl.textContent = `${n} von 3 Berufen besucht — weiter so!`;
+    } else {
+      countEl.textContent = 'Alle drei Berufe angeschaut — top!';
+    }
+  }
+
+  // ===========================
+  // UI UPDATES
+  // ===========================
+  function updateNav() {
+    const sectionSlides = sections[state.currentSection];
+    document.getElementById('btn-prev').disabled = state.currentSlide === 0;
+    document.getElementById('btn-next').disabled = state.currentSlide === sectionSlides.length - 1
+      && state.currentSection !== 'intro'; // allow next at end of intro → goes to hub
+  }
+
+  function updateProgressDots() {
+    const dotsEl = document.getElementById('progress-dots');
+    const sectionSlides = sections[state.currentSection];
+    dotsEl.innerHTML = '';
+
+    sectionSlides.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'dot';
+      if (i === state.currentSlide) {
+        dot.classList.add('active');
+        // Color by section
+        const accent = sectionAccent[state.currentSection];
+        if (accent) dot.style.background = accent;
+        dot.style.width = '24px';
+        dot.style.borderRadius = '4px';
+      }
+      dotsEl.appendChild(dot);
+    });
+  }
+
+  function updateBreadcrumb() {
+    document.getElementById('breadcrumb').textContent = sectionLabel[state.currentSection] || '';
+  }
+
+  function updateHubBtn() {
+    const btn = document.getElementById('hub-btn');
+    const hideOn = ['intro', 'hub'];
+    if (hideOn.includes(state.currentSection)) {
+      btn.classList.remove('visible');
+    } else {
+      btn.classList.add('visible');
+    }
+  }
+
+  // ===========================
+  // KEYBOARD NAVIGATION
+  // ===========================
+  document.addEventListener('keydown', (e) => {
+    switch(e.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+      case ' ':
+        e.preventDefault();
+        navigate(1);
+        break;
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        e.preventDefault();
+        navigate(-1);
+        break;
+      case 'h':
+      case 'H':
+        goToHub();
+        break;
+      case 'f':
+      case 'F':
+        toggleFullscreen();
+        break;
+    }
+  });
+
+  // Click anywhere on slide to advance (except on interactive elements)
+  document.getElementById('app').addEventListener('click', (e) => {
+    const interactive = e.target.closest('button, .hub-card, .choice-card, a, input, select');
+    if (!interactive) {
+      navigate(1);
+    }
+  });
+
+  // ===========================
+  // FULLSCREEN
+  // ===========================
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  }
+
+  // ===========================
+  // REMOTE CONTROLLER (BroadcastChannel)
+  // Sends state to controller.html; receives commands from it.
+  // ===========================
+  let _bc = null;
+  try { _bc = new BroadcastChannel('praesentation_brig_2026'); } catch(e) {}
+
+  function broadcastState() {
+    if (!_bc) return;
+    const slideEl = document.querySelector('.slide.active');
+    const slideTitle = slideEl ? (slideEl.querySelector('.slide-title')?.textContent || sectionLabel[state.currentSection] || '') : '';
+    _bc.postMessage({
+      type: 'stateUpdate',
+      state: {
+        section: state.currentSection,
+        slideIndex: state.currentSlide,
+        slideTitle: slideTitle,
+        sectionLabel: sectionLabel[state.currentSection] || state.currentSection
+      }
+    });
+  }
+
+  if (_bc) {
+    _bc.onmessage = (e) => {
+      const msg = e.data;
+      if (typeof msg === 'string') {
+        // Simple command from old BroadcastChannel controller
+        if (msg === 'next') navigate(1);
+        if (msg === 'prev') navigate(-1);
+        if (msg === 'hub')  goToHub();
+      } else if (msg && msg.action) {
+        // Command from controller.html
+        if (msg.action === 'next') navigate(1);
+        if (msg.action === 'prev') navigate(-1);
+        if (msg.action === 'hub')  goToHub();
+      }
+    };
+  }
+
+  // ===========================
+  // INIT
+  // ===========================
+  function init() {
+    updateHubCards();
+    updateHubActions();
+    showSlide('intro', 0);
+  }
+
+  init();
+</script>
+
+</body>
+</html>
